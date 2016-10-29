@@ -1,0 +1,47 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{35F20FD6-E633-4AD1-A6E1-C52D5D99BE91}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{27F0E5D6-7EE0-496C-9D03-C1ABA06612FA}"
+	ProjectSection(SolutionItems) = preProject
+		global.json = global.json
+	EndProjectSection
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CommandLineParser", "src\CommandLineParser\CommandLineParser.xproj", "{37D2414A-76BA-4113-B071-EB47C44275B4}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CommandLineParser.Tests", "tests\CommandLineParser.Tests\CommandLineParser.Tests.xproj", "{E84FB723-027B-4D24-9ACC-DBE891AAF8E4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{A6515476-54D8-4A8C-AE6D-2B4EDD21D1A0}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "CommandLineParser.TestClient", "CommandLineParser.TestClient\CommandLineParser.TestClient.xproj", "{DED4CC09-4BBC-4536-82D3-7945FC195193}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{37D2414A-76BA-4113-B071-EB47C44275B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37D2414A-76BA-4113-B071-EB47C44275B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37D2414A-76BA-4113-B071-EB47C44275B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37D2414A-76BA-4113-B071-EB47C44275B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E84FB723-027B-4D24-9ACC-DBE891AAF8E4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E84FB723-027B-4D24-9ACC-DBE891AAF8E4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E84FB723-027B-4D24-9ACC-DBE891AAF8E4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E84FB723-027B-4D24-9ACC-DBE891AAF8E4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DED4CC09-4BBC-4536-82D3-7945FC195193}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DED4CC09-4BBC-4536-82D3-7945FC195193}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DED4CC09-4BBC-4536-82D3-7945FC195193}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DED4CC09-4BBC-4536-82D3-7945FC195193}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{37D2414A-76BA-4113-B071-EB47C44275B4} = {35F20FD6-E633-4AD1-A6E1-C52D5D99BE91}
+		{E84FB723-027B-4D24-9ACC-DBE891AAF8E4} = {A6515476-54D8-4A8C-AE6D-2B4EDD21D1A0}
+	EndGlobalSection
+EndGlobal
