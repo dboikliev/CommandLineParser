@@ -11,6 +11,7 @@ namespace CommandLineParser.TestClient
         {
             Console.WriteLine(string.Join(",", args));
             Parser.Parse<Arguments>(args);
+            ITypedParser<int> parser = new ParserFactory().GetParser<int>();
         }
     }
 
