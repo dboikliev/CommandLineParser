@@ -10,12 +10,19 @@ namespace CommandLineParser.TestClient
         public static void Main(string[] args)
         {
             Console.WriteLine(string.Join(",", args));
+            Parser.Parse<Arguments>(args);
         }
     }
 
     class Arguments
     {
-        [Option("-o", "--output")]
+        [Option("o", "output", IsRequired = true)]
         public string OutputDir { get; set; }
+
+        [Option("i", "input")]
+        public string InputDir { get; set; }
+
+        [Value(IsRequired = true)]
+        public int Max { get; set; }
     }
 }

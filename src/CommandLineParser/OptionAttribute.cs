@@ -1,8 +1,5 @@
-﻿using System;
-
-namespace CommandLineParser
+﻿namespace CommandLineParser
 {
-    [AttributeUsage(AttributeTargets.Property)]
     public class OptionAttribute : ArgumentAttribute
     {
         public OptionAttribute(string shortName, string longName) : base(shortName, longName)
@@ -10,10 +7,9 @@ namespace CommandLineParser
         }
     }
 
-    [AttributeUsage(AttributeTargets.Class)]
-    public class CommandAttribute : ArgumentAttribute
+    public class ValueAttribute : ArgumentAttribute
     {
-        public CommandAttribute(string shortName, string longName) : base(shortName, longName)
+        public ValueAttribute() : base(null, null)
         {
         }
     }
