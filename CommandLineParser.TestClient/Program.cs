@@ -10,7 +10,6 @@ namespace CommandLineParser.TestClient
         public static void Main(string[] args)
         {
             Console.WriteLine(string.Join(",", args));
-            Parser.Parse<Arguments>(args);
             ITypedParser<int> parser = new ParserFactory().GetParser<int>();
         }
     }

@@ -7,7 +7,23 @@ namespace CommandLineParser
 {
     public class Parser
     {
-        public static T Parse<T>(string[] args) where T : class
+        private readonly ParserOptions _options;
+        private readonly ParserFactory _parserFactory = new ParserFactory();
+
+        public Parser() : this(new ParserOptions()) 
+        {
+        }
+
+        public Parser(ParserOptions options)
+        {
+            if (options == null)
+            {
+                throw new ArgumentException("The parser requires opions.", nameof(options));
+            }
+            _options = options;
+        }
+
+        public T Parse<T>(string[] args) where T : class
         {
             var properties = typeof(T)
                 .GetRuntimeProperties()
@@ -35,15 +51,9 @@ namespace CommandLineParser
 
             foreach (var argumentProperty in argumentProperties)
             {
-                Console.WriteLine($"{ argumentProperty.Property.PropertyType }, { argumentProperty.Argument }");
+                
             }
             return null;
         }
-    }
-
-    class ArgumentProperty
-    {
-        public PropertyInfo Property { get; set; }
-        public ArgumentAttribute Argument { get; set; }
     }
 }

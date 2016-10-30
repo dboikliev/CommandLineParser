@@ -10,6 +10,5 @@ namespace CommandLineParser
             Int32 parsed = Int32.Parse(value);
             return parsed;
         }
-
     }
 }
