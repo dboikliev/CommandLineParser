@@ -1,7 +1,12 @@
 ﻿namespace CommandLineParser
 {
-    public interface ITypedParser<T>
+    public interface ITypedParser<T> : ITypedParser
     {
-        T Parse(string value);
+        new T Parse(string value);
+    }
+
+    public interface ITypedParser
+    {
+        object Parse(string value);
     }
 }

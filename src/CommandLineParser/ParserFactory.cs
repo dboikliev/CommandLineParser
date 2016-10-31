@@ -30,5 +30,10 @@ namespace CommandLineParser
         {
             return (ITypedParser<T>)TypedParsers[typeof(T)].Value;
         }
+
+        internal ITypedParser GetParser(Type propertyType)
+        {
+            return (ITypedParser)TypedParsers[propertyType].Value;
+        }
     }
 }
