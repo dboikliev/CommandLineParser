@@ -10,19 +10,16 @@ namespace CommandLineParser.TestClient
         public static void Main(string[] args)
         {
             Console.WriteLine(string.Join(",", args));
-            ITypedParser<int> parser = new ParserFactory().GetParser<int>();
+            var parser = new Parser();
+            parser.Register<Arguments>()
+                .On<Arguments>(a => Console.WriteLine(a.Value + " has been parsed."));
         }
     }
 
     class Arguments
     {
-        [Option("o", "output", IsRequired = true)]
-        public string OutputDir { get; set; }
+        [Option('v', "value", IsRequired = true)]
+        public string Value { get; set; }
 
-        [Option("i", "input")]
-        public string InputDir { get; set; }
-
-        [Value(IsRequired = true)]
-        public int Max { get; set; }
     }
 }

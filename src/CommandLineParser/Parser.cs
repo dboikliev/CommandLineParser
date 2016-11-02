@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -9,6 +10,11 @@ namespace CommandLineParser
     {
         private readonly ParserOptions _options;
         private readonly ParserFactory _parserFactory = new ParserFactory();
+
+        private readonly IDictionary<Type, Action<object>> _argumentCallbacks =
+            new Dictionary<Type, Action<object>>();
+
+        private readonly HashSet<string> _arguments = new HashSet<string>();
 
         public Parser() : this(new ParserOptions()) 
         {
@@ -23,8 +29,26 @@ namespace CommandLineParser
             _options = options;
         }
 
-        public T Parse<T>(string[] args) where T : class
+        public Parser On<T>(Action<T> callback) where T : class 
         {
+            var type = typeof(T);
+            if (_argumentCallbacks.ContainsKey(type))
+            {
+                throw new Exception($"A callback is registered for type { type }.");
+            }
+            _argumentCallbacks[type] = (Action<object>)callback;
+            return this;
+        }
+
+        public Parser Parse(string[] args)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Parser Register<T>()
+        {
+            throw new NotImplementedException();
+
             var properties = typeof(T)
                 .GetRuntimeProperties()
                 .ToArray();
@@ -51,9 +75,9 @@ namespace CommandLineParser
 
             foreach (var argumentProperty in argumentProperties)
             {
-                
+
             }
-            return null;
+            return this;
         }
     }
 }
