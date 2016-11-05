@@ -47,8 +47,6 @@ namespace CommandLineParser
 
         public Parser Register<T>()
         {
-            throw new NotImplementedException();
-
             var properties = typeof(T)
                 .GetRuntimeProperties()
                 .ToArray();

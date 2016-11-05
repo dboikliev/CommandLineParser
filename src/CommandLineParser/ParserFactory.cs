@@ -7,21 +7,21 @@ namespace CommandLineParser
 {
     public class ParserFactory
     {
-        private static readonly Dictionary<Type, Lazy<object>> TypedParsers = new Dictionary<Type, Lazy<object>>();
+        private static readonly Dictionary<Type, Lazy<ITypedParser>> TypedParsers = new Dictionary<Type, Lazy<ITypedParser>>();
 
         static ParserFactory()
         {
-            var typedParserInterface = typeof(ITypedParser<Int32>);
+            var typedParserInterface = typeof(ITypedParser<>);
             var types = typedParserInterface.GetTypeInfo().Assembly.GetTypes();
 
             foreach (var type in types)
             {
                 var typeInfo = type.GetTypeInfo();
                 var typedInterface = typeInfo.GetInterfaces()
-                    .FirstOrDefault(i => i.GetTypeInfo().IsGenericType && i == typedParserInterface);
+                    .FirstOrDefault(i => i.GetTypeInfo().IsGenericType && i.GetGenericTypeDefinition() == typedParserInterface);
                 if (typedInterface != null)
                 {
-                    TypedParsers[typedInterface.GenericTypeArguments.First()] = new Lazy<object>(() => Activator.CreateInstance(type));
+                    TypedParsers[typedInterface.GenericTypeArguments.First()] = new Lazy<ITypedParser>(() => (ITypedParser)Activator.CreateInstance(type));
                 }
             }
         }
@@ -33,7 +33,7 @@ namespace CommandLineParser
 
         internal ITypedParser GetParser(Type propertyType)
         {
-            return (ITypedParser)TypedParsers[propertyType].Value;
+            return TypedParsers[propertyType].Value;
         }
     }
 }
