@@ -2,12 +2,14 @@
 {
     public class OptionAttribute : ArgumentAttribute
     {
-        public OptionAttribute(char shortName, string longName) : base(shortName, longName)
-        {
-        }
-    }
+        public string ShortName { get; }
+        public string LongName { get; }
+        public object DefaultValue { get; set; }
 
-    public class ValueAttribute : ArgumentAttribute
-    {
+        public OptionAttribute(char shortName, string longName)
+        {
+            ShortName = shortName.ToString();
+            LongName = longName;
+        }
     }
 }

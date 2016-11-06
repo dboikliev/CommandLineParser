@@ -9,15 +9,15 @@ namespace CommandLineParser.TestClient
     {
         public static void Main(string[] args)
         {
-            Console.WriteLine(string.Join(",", args));
             var parser = new Parser();
             parser.Register<Arguments>()
-                .On<Arguments>(a => Console.WriteLine(a.Value + " has been parsed."));
+                .Parse(args);
         }
     }
 
     class Arguments
     {
+
         [Option('v', "value", IsRequired = true)]
         public string Value { get; set; }
 

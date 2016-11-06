@@ -1,8 +1,8 @@
 ﻿using System;
-using CommandLineParser;
+using CommandLineParser.Exceptions;
 using Xunit;
 
-namespace Tests
+namespace CommandLineParser.Tests
 {
     public class ParserFactoryTests
     {
@@ -12,6 +12,13 @@ namespace Tests
             var factory = new ParserFactory();
             var int32Parser = factory.GetParser<Int32>();
             Assert.IsType<Int32Parser>(int32Parser);
+        }
+
+        [Fact]
+        public void GetParserObjectThrowsTypeNotSupportedException()
+        {
+            var factory = new ParserFactory();
+            Assert.Throws<TypeNotSupportedException>(() => factory.GetParser<object>());
         }
     }
 }
