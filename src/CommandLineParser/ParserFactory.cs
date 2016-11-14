@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using CommandLineParser.Exceptions;
+using CommandLineParser.ParsedArguments;
+using CommandLineParser.TypeParsers;
 
 namespace CommandLineParser
 {
@@ -13,29 +15,43 @@ namespace CommandLineParser
 
         static ParserFactory()
         {
-            var typedParserInterface = typeof(ITypedParser<>);
-            var types = typedParserInterface.GetTypeInfo().Assembly.GetTypes();
+            var typedParser = typeof(ITypedValueParser<>);
+            var types = typedParser.GetTypeInfo().Assembly
+                .GetTypes()
+                .Where(type => !type.GetTypeInfo().IsAbstract);
 
             foreach (var type in types)
             {
                 var typeInfo = type.GetTypeInfo();
                 var typedInterface = typeInfo.GetInterfaces()
-                    .FirstOrDefault(i => i.GetTypeInfo().IsGenericType 
-                        && i.GetGenericTypeDefinition() == typedParserInterface);
+                    .FirstOrDefault(i =>
+                    {
+                        if (i.GetTypeInfo().IsGenericType)
+                        {
+                            var genericInfo = i.GetGenericTypeDefinition();
+                            if (genericInfo == typedParser)
+                            {
+                                return true;
+                            }
+                        }
+                        return false;
+                    });
                 if (typedInterface != null)
                 {
-                    var lazyParser = new Lazy<ITypedParser>(() => (ITypedParser) Activator.CreateInstance(type));
+                    var lazyParser = new Lazy<ITypedParser>(() => (ITypedParser)Activator.CreateInstance(type));
+                    var enumerableParserType = typeof(EnumerableValueParser<>).MakeGenericType(typedInterface.GenericTypeArguments.First());
+                    var lazyEnumerableParser = new Lazy<ITypedParser>(() => (ITypedParser)Activator.CreateInstance(enumerableParserType));
+                    var enumerableKey =
+                        typeof(IEnumerable<>).MakeGenericType(typedInterface.GenericTypeArguments.First());
                     TypedParsers[typedInterface.GenericTypeArguments.First()] = lazyParser;
+                    TypedParsers[enumerableKey] = lazyEnumerableParser;
                 }
             }
         }
 
-        public ITypedParser<T> GetParser<T>()
-        {
-            return (ITypedParser<T>)GetParser(typeof(T));
-        }
+        public ITypedParser this[Type type] => GetParser(type);
 
-        internal ITypedParser GetParser(Type type)
+        public ITypedParser GetParser(Type type)
         {
             if (!TypedParsers.ContainsKey(type))
             {

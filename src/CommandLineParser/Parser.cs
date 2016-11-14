@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
+using CommandLineParser.ParsedArguments;
 using CommandLineParser.Tokens;
 
 namespace CommandLineParser
@@ -25,6 +27,8 @@ namespace CommandLineParser
             new Dictionary<string, ArgumentProperty>();
 
         private IEnumerator<Token> _enumerator;
+        private int _lastValuePosition = 0;
+        private int _currentPosition = 0;
 
         public Parser()
         {
@@ -96,51 +100,97 @@ namespace CommandLineParser
         public void Parse(string[] args)
         {
             var tokens = _tokenizer.Tokenize(args).ToArray();
-            _enumerator = ((IEnumerable<Token>)tokens).GetEnumerator();
+            //_enumerator = ((IEnumerable<Token>)tokens).GetEnumerator();
             Parse(tokens);
             _argumentCallbacks[_topLevelArguments.GetType()].DynamicInvoke(_topLevelArguments);
         }
 
-        private void Parse(IEnumerable<Token> tokens)
+        private void Parse(Token[] tokens)
         {
-            while (_enumerator.MoveNext())
+            while (_currentPosition < tokens.Length)
             {
-                var token = _enumerator.Current;
-                switch (token.Type)
+                if (tokens[_currentPosition].Type == TokenType.Option)
                 {
-                    case TokenType.Option:
-                        ParserOption(tokens);
-                        continue;
-                    case TokenType.Value:
-                        ParsePositionalValue(token);
-                        continue;
-                    default:
-                        return;
+                    var option = ParseOption(tokens);
+                    EvaluateOption(option);
+                }
+                else if (tokens[_currentPosition].Type == TokenType.Value)
+                {
+                    var value = ParseValue(tokens);
+                    EvaluateValue(value);
+                }
+                _currentPosition++;
+            }
+
+
+            //var token = _enumerator.Current;
+            //    switch (token.Type)
+            //    {
+            //        case TokenType.Option:
+
+            //            continue;
+            //        case TokenType.Value:
+            //            var value = ParseValue();
+            //            EvaluateValue(value);
+            //            continue;
+            //        default:
+            //            return;
+            //    }
+            //}
+        }
+
+        private void EvaluateValue(ParsedArgument valueArgument)
+        {
+            var valueProperty = _valueProperties[valueArgument.Position];
+            var parser = _parserFactory.GetParser(valueProperty.Property.PropertyType);
+            var value = parser.Parse(valueArgument.Values);
+            valueProperty.Property.SetValue(_topLevelArguments, value);
+        }
+
+        private void EvaluateOption(ParsedArgument optionArgument)
+        {
+            var argumentProperty = _argumentProperties[optionArgument.Name];
+            var parser = _parserFactory.GetParser(argumentProperty.Property.PropertyType);
+            var value = parser.Parse(optionArgument.Values);
+            argumentProperty.Property.SetValue(_topLevelArguments, value);
+        }
+
+        private ParsedArgument ParseValue(Token[] tokens)
+        {
+            var token = tokens[_currentPosition];
+            var parsedValue = new ParsedArgument
+            {
+                Values = new[] { token.Value },
+                Position = _lastValuePosition++
+            };
+            return parsedValue;
+        }
+
+        private ParsedArgument ParseOption(Token[] tokens)
+        {
+            var token = tokens[_currentPosition++];
+            var parsedOption = new ParsedArgument { Name = token.Value };
+            var values = new List<string>();
+
+            while (tokens[_currentPosition].Type == TokenType.Value)
+            {
+                token = tokens[_currentPosition];
+                values.Add(token.Value);
+
+                if (_currentPosition < tokens.Length - 1 && tokens[_currentPosition + 1].Type == TokenType.Value)
+                {
+                    _currentPosition++;
+                }
+                else
+                {
+                    break;
                 }
             }
-        }
+            
 
-        private void ParsePositionalValue(Token token)
-        {
-            var property = _valueProperties[token.Position].Property;
-            var parser = _parserFactory.GetParser(property.PropertyType);
-            var parsedValue = parser.Parse(token.Value);
-            property.SetValue(_topLevelArguments, parsedValue);
-        }
-
-        private void ParserOption(IEnumerable<Token> tokens)
-        {
-            var optionToken = _enumerator.Current;
-            _enumerator.MoveNext();
-            var valueToken = _enumerator.Current;
-            if (valueToken.Type == TokenType.Value)
-            {
-                var property = _argumentProperties[optionToken.Value].Property;
-                var parser = _parserFactory.GetParser(property.PropertyType);
-                var parsedValue = parser.Parse(valueToken.Value);
-                property.SetValue(_topLevelArguments, parsedValue);
-            }
-            Parse(tokens);
+            parsedOption.Values = values;
+            return parsedOption;
         }
     }
 }
+;
