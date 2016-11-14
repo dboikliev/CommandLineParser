@@ -33,13 +33,7 @@ namespace CommandLineParser
             _tokenizer = new Tokenizer();
         }
 
-        public Parser On<T>(Action<T> callback) where T : class, new()
-        {
-            _argumentCallbacks[typeof(T)] = callback;
-            return this;
-        }
-
-        public Parser Register<T>() where T : class, new()
+        public Parser Register<T>(Action<T> callback) where T : class, new()
         {
             if (_topLevelArguments != null)
             {
@@ -91,6 +85,7 @@ namespace CommandLineParser
                     }
                 }
             }
+            _argumentCallbacks[typeof(T)] = callback;
             _topLevelArguments = new T();
             return this;
         }

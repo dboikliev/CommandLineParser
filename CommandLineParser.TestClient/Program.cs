@@ -10,7 +10,10 @@ namespace CommandLineParser.TestClient
         public static void Main(string[] args)
         {
             var parser = new Parser();
-            parser.Register<Arguments>()
+            parser.Register<Arguments>(arguments =>
+                {
+                    Console.WriteLine(arguments);
+                })
                 .Parse(args);
         }
     }
