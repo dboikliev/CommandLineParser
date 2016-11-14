@@ -19,10 +19,18 @@ namespace CommandLineParser.Tests
             public int Min { get; set; }
         }
 
-        class ArgumentsWithLists
+        class ArgumentsWithList
         {
             [Option('n', "numbers")]
             public IEnumerable<int> Numbers { get; set; }
+        }
+
+        class ArgumentsWithMultipleLists
+        {
+            [Option('i', "numbers")]
+            public IEnumerable<int> Numbers { get; set; }
+            [Option('n', "names")]
+            public IEnumerable<string> Names { get; set; }
         }
 
         [Fact]
@@ -61,14 +69,28 @@ namespace CommandLineParser.Tests
         }
 
         [Fact]
-        public void ParserShouldParseListsOfValuesForOption()
+        public void ParserShouldParseSingleListOfValuesForOption()
         {
             var args = new[] { "-n", "1", "2", "3", "4" };
             var parser = new Parser();
-            parser.Register<ArgumentsWithLists>()
-                .On<ArgumentsWithLists>(arguments =>
+            parser.Register<ArgumentsWithList>()
+                .On<ArgumentsWithList>(arguments =>
                 {
                     Assert.Equal(arguments.Numbers, Enumerable.Range(1, 4));
+                })
+                .Parse(args);
+        }
+
+        [Fact]
+        public void ParserShouldParseMultipleListsOfValuesForOption()
+        {
+            var args = new[] { "--names", "aa", "bb", "cc", "--numbers", "12", "13", "14" };
+            var parser = new Parser();
+            parser.Register<ArgumentsWithMultipleLists>()
+                .On<ArgumentsWithMultipleLists>(arguments =>
+                {
+                    Assert.Equal(arguments.Numbers, new [] { 12, 13, 14 });
+                    Assert.Equal(arguments.Names, new [] { "aa", "bb", "cc" });
                 })
                 .Parse(args);
         }

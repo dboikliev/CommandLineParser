@@ -12,7 +12,7 @@ namespace CommandLineParser.Tests
         {
             var factory = new ParserFactory();
             var int32Parser = factory.GetParser(typeof(Int32));
-            Assert.IsType<Int32ValueParser>(int32Parser);
+            Assert.IsType<Int32Parser>(int32Parser);
         }
 
         [Fact]

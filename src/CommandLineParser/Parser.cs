@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using CommandLineParser.ParsedArguments;
 using CommandLineParser.Tokens;
 
@@ -26,7 +25,6 @@ namespace CommandLineParser
         private readonly Dictionary<string, ArgumentProperty> _argumentProperties =
             new Dictionary<string, ArgumentProperty>();
 
-        private IEnumerator<Token> _enumerator;
         private int _lastValuePosition = 0;
         private int _currentPosition = 0;
 
@@ -121,22 +119,6 @@ namespace CommandLineParser
                 }
                 _currentPosition++;
             }
-
-
-            //var token = _enumerator.Current;
-            //    switch (token.Type)
-            //    {
-            //        case TokenType.Option:
-
-            //            continue;
-            //        case TokenType.Value:
-            //            var value = ParseValue();
-            //            EvaluateValue(value);
-            //            continue;
-            //        default:
-            //            return;
-            //    }
-            //}
         }
 
         private void EvaluateValue(ParsedArgument valueArgument)
@@ -186,7 +168,6 @@ namespace CommandLineParser
                     break;
                 }
             }
-            
 
             parsedOption.Values = values;
             return parsedOption;
