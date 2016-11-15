@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace CommandLineParser
+﻿namespace CommandLineParser.Attributes
 {
-    public class ValueAttribute : ArgumentAttribute
+    public sealed class ValueAttribute : ArgumentAttribute
     {
         public string Name { get; }
         public int Position { get; }

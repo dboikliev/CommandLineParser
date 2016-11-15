@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using CommandLineParser.Exceptions;
-using CommandLineParser.ParsedArguments;
 using CommandLineParser.TypeParsers;
 
 namespace CommandLineParser

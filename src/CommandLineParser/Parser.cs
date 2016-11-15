@@ -2,42 +2,39 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using CommandLineParser.Attributes;
+using CommandLineParser.Exceptions;
 using CommandLineParser.ParsedArguments;
 using CommandLineParser.Tokens;
 
 namespace CommandLineParser
 {
-
     public class Parser
     {
         private readonly ParserFactory _parserFactory = new ParserFactory();
-        private readonly Tokenizer _tokenizer;
+        private readonly Tokenizer _tokenizer = new Tokenizer();
 
         private readonly HashSet<string> _optionNames = new HashSet<string>();
         private readonly HashSet<string> _valueNames = new HashSet<string>();
 
         private readonly Dictionary<Type, MulticastDelegate> _argumentCallbacks = new Dictionary<Type, MulticastDelegate>();
         private object _topLevelArguments;
-        private readonly SortedList<int, ArgumentProperty> _valueProperties =
-            new SortedList<int, ArgumentProperty>();
 
+        private readonly SortedList<int, PropertyInfo> _valueProperties =
+            new SortedList<int, PropertyInfo>();
 
-        private readonly Dictionary<string, ArgumentProperty> _argumentProperties =
-            new Dictionary<string, ArgumentProperty>();
+        private readonly Dictionary<string, PropertyInfo> _argumentProperties =
+            new Dictionary<string, PropertyInfo>();
 
-        private int _lastValuePosition = 0;
-        private int _currentPosition = 0;
+        private int _lastValuePosition;
+        private int _currentPosition;
 
-        public Parser()
-        {
-            _tokenizer = new Tokenizer();
-        }
 
         public Parser Register<T>(Action<T> callback) where T : class, new()
         {
             if (_topLevelArguments != null)
             {
-                throw new Exception("Cannot register multiple top level arguments.");
+                throw new MultipleTopLevelArgumentsNotAllowedException();
             }
 
             var argumentsType = typeof(T);
@@ -52,7 +49,7 @@ namespace CommandLineParser
                     .ToArray();
                 if (argumentAttributes.Length > 1)
                 {
-                    throw new Exception("Multiple argument attributes on the same target are not allowed.");
+                    throw new MultipleArgumentAttributesNotAllowedException();
                 }
 
                 if (argumentAttributes.Length == 1)
@@ -62,11 +59,7 @@ namespace CommandLineParser
                     if (attribute is OptionAttribute)
                     {
                         var option = (OptionAttribute)attribute;
-                        var argumentProperty = new ArgumentProperty()
-                        {
-                            Argument = option,
-                            Property = property
-                        };
+                        var argumentProperty = property;
                         _optionNames.Add(option.ShortName);
                         _optionNames.Add(option.LongName);
                         _argumentProperties[option.ShortName] = argumentProperty;
@@ -77,11 +70,7 @@ namespace CommandLineParser
                         var value = (ValueAttribute)attribute;
                         _valueNames.Add(value.Name);
 
-                        _valueProperties[value.Position] = new ArgumentProperty()
-                        {
-                            Argument = value,
-                            Property = property
-                        };
+                        _valueProperties[value.Position] = property;
                     }
                 }
             }
@@ -93,7 +82,6 @@ namespace CommandLineParser
         public void Parse(string[] args)
         {
             var tokens = _tokenizer.Tokenize(args).ToArray();
-            //_enumerator = ((IEnumerable<Token>)tokens).GetEnumerator();
             Parse(tokens);
             _argumentCallbacks[_topLevelArguments.GetType()].DynamicInvoke(_topLevelArguments);
         }
@@ -119,19 +107,19 @@ namespace CommandLineParser
         private void EvaluateValue(ParsedArgument valueArgument)
         {
             var valueProperty = _valueProperties[valueArgument.Position];
-            valueArgument.Type = valueProperty.Property.PropertyType;
+            valueArgument.Type = valueProperty.PropertyType;
             var parser = _parserFactory.GetParser(valueArgument.Type);
             var value = parser.Parse(valueArgument);
-            valueProperty.Property.SetValue(_topLevelArguments, value);
+            valueProperty.SetValue(_topLevelArguments, value);
         }
 
         private void EvaluateOption(ParsedArgument optionArgument)
         {
             var argumentProperty = _argumentProperties[optionArgument.Name];
-            optionArgument.Type = argumentProperty.Property.PropertyType;
+            optionArgument.Type = argumentProperty.PropertyType;
             var parser = _parserFactory.GetParser(optionArgument.Type);
             var value = parser.Parse(optionArgument);
-            argumentProperty.Property.SetValue(_topLevelArguments, value);
+            argumentProperty.SetValue(_topLevelArguments, value);
         }
 
         private ParsedArgument ParseValue(Token[] tokens)

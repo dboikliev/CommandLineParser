@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CommandLineParser
+namespace CommandLineParser.Attributes
 {
     public abstract class ArgumentAttribute : Attribute
     {

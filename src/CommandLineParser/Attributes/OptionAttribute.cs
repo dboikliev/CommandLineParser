@@ -1,6 +1,6 @@
-﻿namespace CommandLineParser
+﻿namespace CommandLineParser.Attributes
 {
-    public class OptionAttribute : ArgumentAttribute
+    public sealed class OptionAttribute : ArgumentAttribute
     {
         public string ShortName { get; }
         public string LongName { get; }
