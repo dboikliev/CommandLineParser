@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using CommandLineParser.Attributes;
 
 namespace CommandLineParser.TestClient
@@ -10,10 +7,11 @@ namespace CommandLineParser.TestClient
     {
         public static void Main(string[] args)
         {
+            args = new[] { "-v", "a" };
             var parser = new Parser();
             parser.Register<Arguments>(arguments =>
                 {
-                    Console.WriteLine(arguments);
+                    Console.WriteLine(arguments.Value);
                 })
                 .Parse(args);
         }
