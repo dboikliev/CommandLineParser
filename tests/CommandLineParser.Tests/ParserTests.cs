@@ -36,7 +36,7 @@ namespace CommandLineParser.Tests
         [Fact]
         public void ParserShouldParseShortOptionToTestProperty()
         {
-            var args = new[] {"-i", "4"};
+            var args = new[] { "-i", "4" };
             var parser = new Parser();
             parser.Register<Arguments>(arguments => Assert.Equal(arguments.Test, int.Parse(args[1])))
                 .Parse(args);
@@ -66,7 +66,7 @@ namespace CommandLineParser.Tests
         }
 
         [Fact]
-        public void ParserShouldParseSingleListOfValuesForOption()
+        public void ParserShouldParseSingleListOfValues()
         {
             var args = new[] { "-n", "1", "2", "3", "4" };
             var parser = new Parser();
@@ -78,14 +78,14 @@ namespace CommandLineParser.Tests
         }
 
         [Fact]
-        public void ParserShouldParseMultipleListsOfValuesForOption()
+        public void ParserShouldParseMultipleListsOfValues()
         {
             var args = new[] { "--names", "aa", "bb", "cc", "--numbers", "12", "13", "14" };
             var parser = new Parser();
             parser.Register<ArgumentsWithMultipleLists>(arguments =>
                 {
-                    Assert.Equal(arguments.Numbers, new [] { 12, 13, 14 });
-                    Assert.Equal(arguments.Names, new [] { "aa", "bb", "cc" });
+                    Assert.Equal(arguments.Numbers, new[] { 12, 13, 14 });
+                    Assert.Equal(arguments.Names, new[] { "aa", "bb", "cc" });
                 })
                 .Parse(args);
         }

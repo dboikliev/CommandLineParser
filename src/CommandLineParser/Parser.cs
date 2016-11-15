@@ -119,16 +119,18 @@ namespace CommandLineParser
         private void EvaluateValue(ParsedArgument valueArgument)
         {
             var valueProperty = _valueProperties[valueArgument.Position];
-            var parser = _parserFactory.GetParser(valueProperty.Property.PropertyType);
-            var value = parser.Parse(valueArgument.Values);
+            valueArgument.Type = valueProperty.Property.PropertyType;
+            var parser = _parserFactory.GetParser(valueArgument.Type);
+            var value = parser.Parse(valueArgument);
             valueProperty.Property.SetValue(_topLevelArguments, value);
         }
 
         private void EvaluateOption(ParsedArgument optionArgument)
         {
             var argumentProperty = _argumentProperties[optionArgument.Name];
-            var parser = _parserFactory.GetParser(argumentProperty.Property.PropertyType);
-            var value = parser.Parse(optionArgument.Values);
+            optionArgument.Type = argumentProperty.Property.PropertyType;
+            var parser = _parserFactory.GetParser(optionArgument.Type);
+            var value = parser.Parse(optionArgument);
             argumentProperty.Property.SetValue(_topLevelArguments, value);
         }
 

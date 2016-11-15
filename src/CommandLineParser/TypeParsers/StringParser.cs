@@ -1,12 +1,14 @@
 ﻿using System;
+using System.Linq;
+using CommandLineParser.ParsedArguments;
 
 namespace CommandLineParser.TypeParsers
 {
     public class StringParser : BaseValueParser<string>
     {
-        public override string Parse(string value)
+        public override string Parse(ParsedArgument argument)
         {
-            return value;
+            return argument.Values.FirstOrDefault();
         }
     }
 }

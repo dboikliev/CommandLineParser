@@ -1,19 +1,20 @@
 ﻿using System.Collections.Generic;
+using CommandLineParser.ParsedArguments;
 
 namespace CommandLineParser.TypeParsers
 {
     public interface ITypedValueParser<TParsed> : ITypedParser
     {
-        TParsed Parse(string value);
+        TParsed Parse(ParsedArgument argument);
     }
 
     public interface ITypedEnumerableParser<TParsed> : ITypedParser
     {
-        IEnumerable<TParsed> Parse(IEnumerable<string> values);
+        IEnumerable<TParsed> Parse(ParsedArgument argument);
     }
 
     public interface ITypedParser
     {
-        object Parse(object value);
+        object Parse(ParsedArgument argument);
     }
 }
