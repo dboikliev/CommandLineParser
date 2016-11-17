@@ -1,5 +1,8 @@
-﻿using System;
-using CommandLineParser.Attributes;
+﻿using CommandLineParser.Attributes;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace CommandLineParser.TestClient
 {
@@ -7,21 +10,19 @@ namespace CommandLineParser.TestClient
     {
         public static void Main(string[] args)
         {
-            args = new[] { "-v", "a" };
+            args = new[] { "--files", @"D:\Fake_CV.txt" };
             var parser = new Parser();
             parser.Register<Arguments>(arguments =>
-                {
-                    Console.WriteLine(arguments.Value);
-                })
-                .Parse(args);
+            {
+                Console.WriteLine(string.Join(", ", arguments.Files.Select(f => f.FullName)));
+            }).Parse(args);
         }
     }
 
     class Arguments
     {
-
-        [Option('v', "value", IsRequired = true)]
-        public string Value { get; set; }
+        [Option('f', "files")]
+        public IEnumerable<FileInfo> Files { get; set; }
 
     }
 }

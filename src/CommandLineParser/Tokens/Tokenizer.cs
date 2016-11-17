@@ -18,7 +18,7 @@ namespace CommandLineParser.Tokens
                 {
                     yield return new Token(TokenType.Option, i, argument);
                 }
-                else if (IsValue(argument))
+                else 
                 {
                     yield return new Token(TokenType.Value, i, argument);
                 }
@@ -35,10 +35,6 @@ namespace CommandLineParser.Tokens
             return argument.Length == 2 && argument.StartsWith("-")
                    || argument.Length > 2 && argument.StartsWith("--");
         }
-
-        public bool IsValue(string argument)
-        {
-            return !IsOption(argument);
-        }
+        
     }
 }
