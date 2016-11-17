@@ -45,9 +45,9 @@ namespace CommandLineParser
             }
         }
 
-        public ITypedParser this[Type type] => GetParser(type);
+        internal ITypedParser this[Type type] => GetParser(type);
 
-        public ITypedParser GetParser(Type type)
+        internal ITypedParser GetParser(Type type)
         {
             if (!TypedParsers.ContainsKey(type))
             {

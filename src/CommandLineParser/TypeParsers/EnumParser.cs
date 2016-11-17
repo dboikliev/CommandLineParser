@@ -4,7 +4,7 @@ using CommandLineParser.ParsedArguments;
 
 namespace CommandLineParser.TypeParsers
 {
-    public class EnumParser : BaseValueParser<Enum>
+    public sealed class EnumParser : BaseValueParser<Enum>
     {
         public override Enum Parse(ParsedArgument argument)
         {

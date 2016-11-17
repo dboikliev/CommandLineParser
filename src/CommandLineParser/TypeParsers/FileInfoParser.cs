@@ -4,7 +4,7 @@ using CommandLineParser.ParsedArguments;
 
 namespace CommandLineParser.TypeParsers
 {
-    public class FileInfoParser : BaseValueParser<FileInfo>
+    public sealed class FileInfoParser : BaseValueParser<FileInfo>
     {
         public override FileInfo Parse(ParsedArgument argument)
         {

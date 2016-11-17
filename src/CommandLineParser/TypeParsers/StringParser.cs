@@ -4,7 +4,7 @@ using CommandLineParser.ParsedArguments;
 
 namespace CommandLineParser.TypeParsers
 {
-    public class StringParser : BaseValueParser<string>
+    public sealed class StringParser : BaseValueParser<string>
     {
         public override string Parse(ParsedArgument argument)
         {

@@ -3,7 +3,7 @@ using CommandLineParser.ParsedArguments;
 
 namespace CommandLineParser.TypeParsers
 {
-    public class BooleanParser : BaseValueParser<bool>
+    public sealed class BooleanParser : BaseValueParser<bool>
     {
         public override bool Parse(ParsedArgument argument)
         {
