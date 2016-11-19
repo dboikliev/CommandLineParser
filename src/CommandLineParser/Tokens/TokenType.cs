@@ -4,6 +4,7 @@
     {
         Option,
         Value,
+        Flag,
         EndOfList
     }
 }

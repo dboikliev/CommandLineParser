@@ -11,31 +11,32 @@ namespace CommandLineParser
 {
     public class Parser
     {
-        private readonly ParserFactory _parserFactory = new ParserFactory();
-        private readonly Tokenizer _tokenizer = new Tokenizer();
+        private object _arguments;
 
+        private readonly ParserFactory _parserFactory = new ParserFactory();
         private readonly HashSet<string> _optionNames = new HashSet<string>();
+        private readonly HashSet<string> _flagNames = new HashSet<string>();
         private readonly HashSet<string> _valueNames = new HashSet<string>();
 
         private readonly Dictionary<Type, MulticastDelegate> _argumentCallbacks = new Dictionary<Type, MulticastDelegate>();
-        private object _topLevelArguments;
 
-        private readonly SortedList<int, PropertyInfo> _valueProperties =
-            new SortedList<int, PropertyInfo>();
+        private readonly SortedList<int, ArgumentProperty> _valueProperties =
+            new SortedList<int, ArgumentProperty>();
 
-        private readonly Dictionary<string, PropertyInfo> _argumentProperties =
-            new Dictionary<string, PropertyInfo>();
+        private readonly Dictionary<string, ArgumentProperty> _argumentProperties =
+            new Dictionary<string, ArgumentProperty>();
 
-        private int _lastValuePosition;
         private int _currentPosition;
+        private int _lastValuePosition;
 
 
         public Parser Register<T>(Action<T> callback) where T : class, new()
         {
-            if (_topLevelArguments != null)
+            if (_arguments != null)
             {
                 throw new MultipleTopLevelArgumentsNotAllowedException();
             }
+
 
             var argumentsType = typeof(T);
 
@@ -56,12 +57,27 @@ namespace CommandLineParser
                 {
                     var attribute = argumentAttributes.First();
 
+                    var argumentProperty = new ArgumentProperty
+                    {
+                        Argument = attribute,
+                        Property = property
+                    };
+                    ;
+
                     if (attribute is OptionAttribute)
                     {
                         var option = (OptionAttribute)attribute;
-                        var argumentProperty = property;
-                        _optionNames.Add(option.ShortName);
-                        _optionNames.Add(option.LongName);
+                        if (property.PropertyType == typeof(bool))
+                        {
+                            _flagNames.Add(option.ShortName);
+                            _flagNames.Add(option.LongName);
+                        }
+                        else
+                        {
+                            _optionNames.Add(option.ShortName);
+                            _optionNames.Add(option.LongName);
+                        }
+
                         _argumentProperties[option.ShortName] = argumentProperty;
                         _argumentProperties[option.LongName] = argumentProperty;
                     }
@@ -70,20 +86,22 @@ namespace CommandLineParser
                         var value = (ValueAttribute)attribute;
                         _valueNames.Add(value.Name);
 
-                        _valueProperties[value.Position] = property;
+                        _valueProperties[value.Position] = argumentProperty;
                     }
                 }
             }
+
             _argumentCallbacks[typeof(T)] = callback;
-            _topLevelArguments = new T();
+            _arguments = new T();
             return this;
         }
 
         public void Parse(string[] args)
         {
+            var _tokenizer = new Tokenizer(_optionNames, _flagNames);
             var tokens = _tokenizer.Tokenize(args).ToArray();
             Parse(tokens);
-            _argumentCallbacks[_topLevelArguments.GetType()].DynamicInvoke(_topLevelArguments);
+            _argumentCallbacks[_arguments.GetType()].DynamicInvoke(_arguments);
         }
 
         private void Parse(Token[] tokens)
@@ -95,31 +113,76 @@ namespace CommandLineParser
                     var option = ParseOption(tokens);
                     EvaluateOption(option);
                 }
+                else if (tokens[_currentPosition].Type == TokenType.Flag)
+                {
+                    var flag = ParseOption(tokens);
+                    EvaluateFlag(flag);
+                }
                 else if (tokens[_currentPosition].Type == TokenType.Value)
                 {
                     var value = ParseValue(tokens);
                     EvaluateValue(value);
+                    _valueProperties.Remove(_currentPosition);
                 }
                 _currentPosition++;
             }
         }
 
+        private void EvaluateFlag(ParsedArgument flagArgument)
+        {
+            var argumentProperty = _argumentProperties[flagArgument.Name];
+            var attribute = (OptionAttribute)argumentProperty.Argument;
+            flagArgument.Type = argumentProperty.Property.PropertyType;
+            object value = null;
+            if (flagArgument.Values.Any())
+            {
+                var parser = _parserFactory.GetParser(flagArgument.Type);
+                value = parser.Parse(flagArgument);
+            }
+            else if (attribute.DefaultValue != null &&
+                     attribute.DefaultValue.GetType() == argumentProperty.Property.PropertyType) 
+            {
+                value = attribute.DefaultValue;
+            }
+            else
+            {
+                value = true;
+            }
+
+            argumentProperty.Property.SetValue(_arguments, value);
+        }
+
         private void EvaluateValue(ParsedArgument valueArgument)
         {
-            var valueProperty = _valueProperties[valueArgument.Position];
-            valueArgument.Type = valueProperty.PropertyType;
+            var argumentProperty = _valueProperties[valueArgument.Position];
+            valueArgument.Type = argumentProperty.Property.PropertyType;
             var parser = _parserFactory.GetParser(valueArgument.Type);
             var value = parser.Parse(valueArgument);
-            valueProperty.SetValue(_topLevelArguments, value);
+            argumentProperty.Property.SetValue(_arguments, value);
         }
 
         private void EvaluateOption(ParsedArgument optionArgument)
         {
             var argumentProperty = _argumentProperties[optionArgument.Name];
-            optionArgument.Type = argumentProperty.PropertyType;
-            var parser = _parserFactory.GetParser(optionArgument.Type);
-            var value = parser.Parse(optionArgument);
-            argumentProperty.SetValue(_topLevelArguments, value);
+            var attribute = (OptionAttribute)argumentProperty.Argument;
+            optionArgument.Type = argumentProperty.Property.PropertyType;
+            object value = null;
+            if (optionArgument.Values.Any())
+            {
+                var parser = _parserFactory.GetParser(optionArgument.Type);
+                value = parser.Parse(optionArgument);
+            }
+            else if (attribute.DefaultValue != null && 
+                attribute.DefaultValue.GetType() == argumentProperty.Property.PropertyType)
+            {
+                value = attribute.DefaultValue;
+            }
+            else if (attribute.IsRequired)
+            {
+                throw new MissingValueForRequiredOption(optionArgument.Name);
+            }
+
+            argumentProperty.Property.SetValue(_arguments, value);
         }
 
         private ParsedArgument ParseValue(Token[] tokens)
@@ -139,7 +202,7 @@ namespace CommandLineParser
             var parsedOption = new ParsedArgument { Name = token.Value };
             var values = new List<string>();
 
-            while (tokens[_currentPosition].Type == TokenType.Value)
+            while (_currentPosition < tokens.Length && tokens[_currentPosition].Type == TokenType.Value)
             {
                 token = tokens[_currentPosition];
                 values.Add(token.Value);

@@ -10,12 +10,7 @@
         {
             Type = type;
             Position = position;
-            Value = Normalize(value);
-        }
-
-        private static string Normalize(string value)
-        {
-            return value.Trim('-');
+            Value = value;
         }
     }
 }
