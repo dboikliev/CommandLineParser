@@ -35,7 +35,7 @@ namespace CommandLineParser.Tests
         }
 
         [Fact]
-        public void ParserShouldParseShortOptionToTestProperty()
+        public void ParseShortOptionToTestProperty()
         {
             var args = new[] { "-i", "4" };
             var parser = new Parser();
@@ -44,7 +44,7 @@ namespace CommandLineParser.Tests
         }
 
         [Fact]
-        public void ParserShouldParseLongOptionToTestProperty()
+        public void ParseLongOptionToTestProperty()
         {
             var args = new[] { "--integer", "4" };
             var parser = new Parser();
@@ -53,7 +53,7 @@ namespace CommandLineParser.Tests
         }
 
         [Fact]
-        public void ParserShouldParserMultipleProperties()
+        public void ParseMultipleProperties()
         {
             var args = new[] { "4", "-i", "4", "-t", "10" };
             var parser = new Parser();
@@ -67,7 +67,7 @@ namespace CommandLineParser.Tests
         }
 
         [Fact]
-        public void ParserShouldParseSingleListOfValues()
+        public void ParseSingleListOfValues()
         {
             var args = new[] { "-n", "1", "2", "3", "4" };
             var parser = new Parser();
@@ -79,7 +79,7 @@ namespace CommandLineParser.Tests
         }
 
         [Fact]
-        public void ParserShouldParseMultipleListsOfValues()
+        public void ParseMultipleListsOfValues()
         {
             var args = new[] { "--names", "aa", "bb", "cc", "--numbers", "12", "13", "14" };
             var parser = new Parser();

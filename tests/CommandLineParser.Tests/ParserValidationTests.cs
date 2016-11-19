@@ -14,7 +14,7 @@ namespace CommandLineParser.Tests
         }
 
         [Fact]
-        public void ParserShouldThrowExceptionIfMultipleArgumentAttributesAreApplied()
+        public void ThrowExceptionIfMultipleArgumentAttributesAreApplied()
         {
             var parser = new Parser();
             Assert.Throws<MultipleArgumentAttributesNotAllowedException>(

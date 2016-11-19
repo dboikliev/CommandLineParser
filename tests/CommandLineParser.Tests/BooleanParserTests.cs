@@ -19,7 +19,7 @@ namespace CommandLineParser.Tests
         }
 
         [Fact]
-        public void ParserShouldParseStringAsTrue()
+        public void ParseStringAsTrue()
         {
             var args = new[] { "-a", "True" };
             var parser = new Parser();
@@ -32,7 +32,7 @@ namespace CommandLineParser.Tests
         }
 
         [Fact]
-        public void ParserShouldParseBooleanOptionWithoutValueAsTrue()
+        public void ParseBooleanOptionWithoutValueAsTrue()
         {
             var args = new[] { "-a" };
             var parser = new Parser();
@@ -45,7 +45,7 @@ namespace CommandLineParser.Tests
         }
 
         [Fact]
-        public void ParserShouldParseBooleanOptionWidthDefaultValueAsFalse()
+        public void ParseBooleanOptionWidthDefaultValueAsFalse()
         {
             var args = new[] { "-a" };
             var parser = new Parser();

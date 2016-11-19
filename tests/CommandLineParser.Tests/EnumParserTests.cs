@@ -26,7 +26,7 @@ namespace CommandLineParser.Tests
         }
 
         [Fact]
-        public void ParserShouldParseTextAsRedEnum()
+        public void ParseTextAsRedEnum()
         {
             var args = new[] { "-c", "RED" };
             var parser = new Parser();
@@ -38,7 +38,7 @@ namespace CommandLineParser.Tests
         }
 
         [Fact]
-        public void ParserShouldParseTextAsGreenEnum()
+        public void ParseTextAsGreenEnum()
         {
             var args = new[] { "-c", "GREEN" };
             var parser = new Parser();
@@ -50,7 +50,7 @@ namespace CommandLineParser.Tests
         }
 
         [Fact]
-        public void ParserShouldParseTextAsBlueEnum()
+        public void ParseTextAsBlueEnum()
         {
             var args = new[] { "-c", "BLUE" };
             var parser = new Parser();
@@ -62,7 +62,7 @@ namespace CommandLineParser.Tests
         }
 
         [Fact]
-        public void ParserShouldParseTextAsIEnumerableOfColorEnum()
+        public void ParseTextAsIEnumerableOfColorEnum()
         {
             var args = new[] { "-c", "BLUE", "RED", "GREEN" };
             var parser = new Parser();
