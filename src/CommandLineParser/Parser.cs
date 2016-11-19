@@ -67,19 +67,23 @@ namespace CommandLineParser
                     if (attribute is OptionAttribute)
                     {
                         var option = (OptionAttribute) attribute;
-                        if (property.PropertyType == typeof(bool))
-                        {
-                            _flagNames.Add(option.ShortName);
-                            _flagNames.Add(option.LongName);
-                        }
-                        else
-                        {
-                            _optionNames.Add(option.ShortName);
-                            _optionNames.Add(option.LongName);
-                        }
-
+                        
+                        _optionNames.Add(option.ShortName);
+                        _optionNames.Add(option.LongName);
                         _argumentProperties[option.ShortName] = argumentProperty;
                         _argumentProperties[option.LongName] = argumentProperty;
+                    }
+                    else if (attribute is FlagAttribute)
+                    {
+                        if (property.PropertyType != typeof(bool))
+                        {
+                            throw new InvalidAttributeUsageException($"{nameof(FlagAttribute)} can only be used on boolean properties.");
+                        }
+                        var flag = (FlagAttribute) attribute;
+                        _flagNames.Add(flag.ShortName);
+                        _flagNames.Add(flag.LongName);
+                        _argumentProperties[flag.ShortName] = argumentProperty;
+                        _argumentProperties[flag.LongName] = argumentProperty;
                     }
                     else if (attribute is ValueAttribute)
                     {
@@ -111,12 +115,24 @@ namespace CommandLineParser
                 if (tokens[_currentPosition].Type == TokenType.Option)
                 {
                     var option = ParseOption(tokens);
+                    var argumentProperty = _argumentProperties[option.Name];
+                    if (argumentProperty.Evaluated)
+                    {
+                        throw new RepeatingArgumentsException($"Argument {option.Name} has already been evaluated.");
+                    }
                     EvaluateOption(option);
+                    argumentProperty.Evaluated = true;
                 }
                 else if (tokens[_currentPosition].Type == TokenType.Flag)
                 {
-                    var flag = ParseOption(tokens);
+                    var flag = ParseFlag(tokens);
+                    var argumentProperty = _argumentProperties[flag.Name];
+                    if (argumentProperty.Evaluated)
+                    {
+                        throw new RepeatingArgumentsException($"Argument {flag.Name} has already been evaluated.");
+                    }
                     EvaluateFlag(flag);
+                    argumentProperty.Evaluated = true;
                 }
                 else if (tokens[_currentPosition].Type == TokenType.Value)
                 {
@@ -126,30 +142,14 @@ namespace CommandLineParser
                 }
                 _currentPosition++;
             }
+            
+            
         }
 
         private void EvaluateFlag(ParsedArgument flagArgument)
         {
             var argumentProperty = _argumentProperties[flagArgument.Name];
-            var attribute = (OptionAttribute) argumentProperty.Argument;
-            flagArgument.Type = argumentProperty.Property.PropertyType;
-            object value;
-            if (flagArgument.Values.Any())
-            {
-                var parser = _parserFactory.GetParser(flagArgument.Type);
-                value = parser.Parse(flagArgument);
-            }
-            else if (attribute.DefaultValue != null &&
-                     attribute.DefaultValue.GetType() == argumentProperty.Property.PropertyType)
-            {
-                value = attribute.DefaultValue;
-            }
-            else
-            {
-                value = true;
-            }
-
-            argumentProperty.Property.SetValue(_arguments, value);
+            argumentProperty.Property.SetValue(_arguments, true);
         }
 
         private void EvaluateValue(ParsedArgument valueArgument)
@@ -171,11 +171,6 @@ namespace CommandLineParser
             {
                 var parser = _parserFactory.GetParser(optionArgument.Type);
                 value = parser.Parse(optionArgument);
-            }
-            else if (attribute.DefaultValue != null &&
-                     attribute.DefaultValue.GetType() == argumentProperty.Property.PropertyType)
-            {
-                value = attribute.DefaultValue;
             }
             else if (attribute.IsRequired)
             {
@@ -210,6 +205,13 @@ namespace CommandLineParser
             }
 
             parsedOption.Values = values;
+            return parsedOption;
+        }
+
+        private ParsedArgument ParseFlag(Token[] tokens)
+        {
+            var token = tokens[_currentPosition];
+            var parsedOption = new ParsedArgument { Name = token.Value };
             return parsedOption;
         }
     }

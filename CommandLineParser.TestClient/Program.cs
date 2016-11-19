@@ -1,7 +1,4 @@
 ﻿using CommandLineParser.Attributes;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using static System.Console;
 
 namespace CommandLineParser.TestClient
@@ -10,7 +7,7 @@ namespace CommandLineParser.TestClient
     {
         public static void Main(string[] args)
         {
-            args = new[] { "-l", "-d" };
+            args = new[] { "-ld" };
             var parser = new Parser();
             parser.Register<Arguments>(arguments =>
             {
@@ -21,9 +18,9 @@ namespace CommandLineParser.TestClient
 
     class Arguments
     {
-        [Option('d', "delete")]
+        [Flag('d', "delete")]
         public bool Delete { get; set; }
-        [Option('l', "log")]
+        [Flag('l', "log")]
         public bool Log{ get; set; }
     }
 }

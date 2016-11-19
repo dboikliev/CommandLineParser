@@ -7,5 +7,6 @@ namespace CommandLineParser
     {
         public ArgumentAttribute Argument { get; set; }
         public PropertyInfo Property { get; set; }
+        public bool Evaluated { get; set; }
     }
 }

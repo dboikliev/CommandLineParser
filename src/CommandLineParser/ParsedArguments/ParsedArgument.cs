@@ -10,6 +10,6 @@ namespace CommandLineParser.ParsedArguments
         public Type Type { get; set; }
         public string Name { get; set; }
         public int Position { get; set; }
-        public IEnumerable<string> Values { get; set; }
+        public IEnumerable<string> Values { get; set; } = new List<string>();
     }
 }
