@@ -18,6 +18,15 @@ namespace CommandLineParser.Tests
             public bool IsActive { get; set; }
         }
 
+
+        class ArgumentsWithMultipleBooleanProperties
+        {
+            [Option('d', "delete")]
+            public bool Delete { get; set; }
+            [Option('l', "log")]
+            public bool Log { get; set; }
+        }
+
         [Fact]
         public void ParseStringAsTrue()
         {
@@ -55,6 +64,20 @@ namespace CommandLineParser.Tests
                 Assert.False(arguments.IsActive);
             })
             .Parse(args);
+        }
+
+        [Fact]
+        public void ParseMultipleBooleanArguments()
+        {
+            var args = new[] { "-l", "-d" };
+            var parser = new Parser();
+
+            parser.Register<ArgumentsWithMultipleBooleanProperties>(arguments =>
+            {
+                Assert.True(arguments.Log);
+                Assert.True(arguments.Delete);
+            })
+                .Parse(args);
         }
     }
 }

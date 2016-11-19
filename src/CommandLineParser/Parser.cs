@@ -198,23 +198,15 @@ namespace CommandLineParser
 
         private ParsedArgument ParseOption(Token[] tokens)
         {
-            var token = tokens[_currentPosition++];
+            var token = tokens[_currentPosition];
             var parsedOption = new ParsedArgument {Name = token.Value};
             var values = new List<string>();
 
-            while (_currentPosition < tokens.Length && tokens[_currentPosition].Type == TokenType.Value)
+            while (_currentPosition + 1 < tokens.Length && tokens[_currentPosition + 1].Type == TokenType.Value)
             {
+                _currentPosition++;
                 token = tokens[_currentPosition];
                 values.Add(token.Value);
-
-                if (_currentPosition < tokens.Length - 1 && tokens[_currentPosition + 1].Type == TokenType.Value)
-                {
-                    _currentPosition++;
-                }
-                else
-                {
-                    break;
-                }
             }
 
             parsedOption.Values = values;

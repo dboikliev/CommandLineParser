@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using static System.Console;
 
 namespace CommandLineParser.TestClient
 {
@@ -10,19 +10,20 @@ namespace CommandLineParser.TestClient
     {
         public static void Main(string[] args)
         {
-            args = new[] { "--files", @"D:\Fake_CV.txt" };
+            args = new[] { "-l", "-d" };
             var parser = new Parser();
             parser.Register<Arguments>(arguments =>
             {
-                Console.WriteLine(string.Join(", ", arguments.Files.Select(f => f.FullName)));
+                WriteLine($"Log: {arguments.Log}, Delete: {arguments.Delete}");
             }).Parse(args);
         }
     }
 
     class Arguments
     {
-        [Option('f', "files")]
-        public IEnumerable<FileInfo> Files { get; set; }
-
+        [Option('d', "delete")]
+        public bool Delete { get; set; }
+        [Option('l', "log")]
+        public bool Log{ get; set; }
     }
 }
