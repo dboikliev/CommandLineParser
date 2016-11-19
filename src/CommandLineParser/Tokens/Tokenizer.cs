@@ -8,10 +8,10 @@ namespace CommandLineParser.Tokens
         private readonly HashSet<string> _optionNames;
         private readonly HashSet<string> _flagNames;
 
-        public Tokenizer(HashSet<string> _optionNames, HashSet<string> _flagNames)
+        public Tokenizer(HashSet<string> optionNames, HashSet<string> flagNames)
         {
-            this._optionNames = _optionNames;
-            this._flagNames = _flagNames;
+            _optionNames = optionNames;
+            _flagNames = flagNames;
         }
 
         public IEnumerable<Token> Tokenize(string[] args)
