@@ -18,7 +18,8 @@ namespace CommandLineParser
         private readonly HashSet<string> _flagNames = new HashSet<string>();
         private readonly HashSet<string> _valueNames = new HashSet<string>();
 
-        private readonly Dictionary<Type, MulticastDelegate> _argumentCallbacks = new Dictionary<Type, MulticastDelegate>();
+        private readonly Dictionary<Type, MulticastDelegate> _argumentCallbacks =
+            new Dictionary<Type, MulticastDelegate>();
 
         private readonly SortedList<int, ArgumentProperty> _valueProperties =
             new SortedList<int, ArgumentProperty>();
@@ -62,11 +63,10 @@ namespace CommandLineParser
                         Argument = attribute,
                         Property = property
                     };
-                    ;
 
                     if (attribute is OptionAttribute)
                     {
-                        var option = (OptionAttribute)attribute;
+                        var option = (OptionAttribute) attribute;
                         if (property.PropertyType == typeof(bool))
                         {
                             _flagNames.Add(option.ShortName);
@@ -83,7 +83,7 @@ namespace CommandLineParser
                     }
                     else if (attribute is ValueAttribute)
                     {
-                        var value = (ValueAttribute)attribute;
+                        var value = (ValueAttribute) attribute;
                         _valueNames.Add(value.Name);
 
                         _valueProperties[value.Position] = argumentProperty;
@@ -98,8 +98,8 @@ namespace CommandLineParser
 
         public void Parse(string[] args)
         {
-            var _tokenizer = new Tokenizer(_optionNames, _flagNames);
-            var tokens = _tokenizer.Tokenize(args).ToArray();
+            var tokenizer = new Tokenizer(_optionNames, _flagNames);
+            var tokens = tokenizer.Tokenize(args).ToArray();
             Parse(tokens);
             _argumentCallbacks[_arguments.GetType()].DynamicInvoke(_arguments);
         }
@@ -131,16 +131,16 @@ namespace CommandLineParser
         private void EvaluateFlag(ParsedArgument flagArgument)
         {
             var argumentProperty = _argumentProperties[flagArgument.Name];
-            var attribute = (OptionAttribute)argumentProperty.Argument;
+            var attribute = (OptionAttribute) argumentProperty.Argument;
             flagArgument.Type = argumentProperty.Property.PropertyType;
-            object value = null;
+            object value;
             if (flagArgument.Values.Any())
             {
                 var parser = _parserFactory.GetParser(flagArgument.Type);
                 value = parser.Parse(flagArgument);
             }
             else if (attribute.DefaultValue != null &&
-                     attribute.DefaultValue.GetType() == argumentProperty.Property.PropertyType) 
+                     attribute.DefaultValue.GetType() == argumentProperty.Property.PropertyType)
             {
                 value = attribute.DefaultValue;
             }
@@ -164,7 +164,7 @@ namespace CommandLineParser
         private void EvaluateOption(ParsedArgument optionArgument)
         {
             var argumentProperty = _argumentProperties[optionArgument.Name];
-            var attribute = (OptionAttribute)argumentProperty.Argument;
+            var attribute = (OptionAttribute) argumentProperty.Argument;
             optionArgument.Type = argumentProperty.Property.PropertyType;
             object value = null;
             if (optionArgument.Values.Any())
@@ -172,8 +172,8 @@ namespace CommandLineParser
                 var parser = _parserFactory.GetParser(optionArgument.Type);
                 value = parser.Parse(optionArgument);
             }
-            else if (attribute.DefaultValue != null && 
-                attribute.DefaultValue.GetType() == argumentProperty.Property.PropertyType)
+            else if (attribute.DefaultValue != null &&
+                     attribute.DefaultValue.GetType() == argumentProperty.Property.PropertyType)
             {
                 value = attribute.DefaultValue;
             }
@@ -190,7 +190,7 @@ namespace CommandLineParser
             var token = tokens[_currentPosition];
             var parsedValue = new ParsedArgument
             {
-                Values = new[] { token.Value },
+                Values = new[] {token.Value},
                 Position = _lastValuePosition++
             };
             return parsedValue;
@@ -199,7 +199,7 @@ namespace CommandLineParser
         private ParsedArgument ParseOption(Token[] tokens)
         {
             var token = tokens[_currentPosition++];
-            var parsedOption = new ParsedArgument { Name = token.Value };
+            var parsedOption = new ParsedArgument {Name = token.Value};
             var values = new List<string>();
 
             while (_currentPosition < tokens.Length && tokens[_currentPosition].Type == TokenType.Value)
@@ -222,4 +222,3 @@ namespace CommandLineParser
         }
     }
 }
-;
