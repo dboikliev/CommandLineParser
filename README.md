@@ -1,5 +1,5 @@
 # CommandLineParser (under construction)
-A library for parsing command line arguments.
+A library for parsing command line arguments. Written in C#, based on .NET Core.
 
 ## Features
 - Unnamed values
