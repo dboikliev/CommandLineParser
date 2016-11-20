@@ -37,11 +37,11 @@ public static void Main(string[] args)
 
 Call the program:
 ```
-program.exe --input "D:\input.txt" --output "D:\output.txt"
+program.exe --input D:\input.txt --output D:\output.txt
 ```
 
 Result:
 ```
-D:\in.txt
-D:\out.txt
+D:\input.txt
+D:\output.txt
 ```
