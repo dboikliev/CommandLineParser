@@ -9,7 +9,7 @@ A library for parsing command line arguments.
 
 ##Examples
 
-1. Registering types and parsing
+###1. Registering types and parsing
 Define a class which will hold the parsed arguments:
 ```csharp
 class Arguments
