@@ -3,7 +3,7 @@ A library for parsing command line arguments.
 
 ## Features
 - Unnamed values
-- Single or multi-valued options
+- [Single or multi-valued options](#2-options)
 - Bool flags
 - Commands
 
