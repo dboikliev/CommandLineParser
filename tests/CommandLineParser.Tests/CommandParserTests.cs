@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices.ComTypes;
-using CommandLineParser.Attributes;
+﻿using CommandLineParser.Attributes;
 using Xunit;
 
 namespace CommandLineParser.Tests
@@ -22,6 +21,9 @@ namespace CommandLineParser.Tests
 
         [Value(1, "foo")]
         public int Bar { get; set; }
+
+        [Value(2, "moo")]
+        public int Moo { get; set; }
     }
 
 
@@ -46,16 +48,19 @@ namespace CommandLineParser.Tests
         [Fact]
         public void ParseCommandWithPositionalValueARgument()
         {
-            var args = new[] { "10", "-t", "test", "command", "1", "2", "-i", "innerTest" };
+            var args = new[] { "10", "-t", "test", "command", "1", "2", "-i", "innerTest", "--", "3" };
             var parser = new Parser();
             parser.Register<Arguments>(arguments =>
             {
                 Assert.Equal(arguments.Max, 10);
+                Assert.Equal(arguments.Test, "test");
             });
             parser.Register<CommandArguments>(commandArgs =>
             {
                 Assert.Equal(commandArgs.Foo, 1);
                 Assert.Equal(commandArgs.Bar, 2);
+                Assert.Equal(commandArgs.Moo, 3);
+                Assert.Equal(commandArgs.InnerOption, "innerTest");
             });
             parser.Parse(args);
         }

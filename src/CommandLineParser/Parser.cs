@@ -37,6 +37,12 @@ namespace CommandLineParser
         private readonly Dictionary<string, object> _commandArguments = 
             new Dictionary<string, object>();
 
+        /// <summary>
+        /// Registers a type into the parser.
+        /// </summary>
+        /// <typeparam name="T">The type being registered.</typeparam>
+        /// <param name="callback">A callback which will be executed when the values of the registered type have been parsed.</param>
+        /// <returns></returns>
         public Parser Register<T>(Action<T> callback) where T : class, new()
         {
             var argumentsType = typeof(T);
@@ -124,6 +130,10 @@ namespace CommandLineParser
             return this;
         }
 
+        /// <summary>
+        /// Iterates over the arguments, maps them to properties of the registered types and executes their callbacks.
+        /// </summary>
+        /// <param name="args">The command line arguments</param>
         public void Parse(string[] args)
         {
             var tokenizer = new Tokenizer(_optionNames, _flagNames, _commandNames);
