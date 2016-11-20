@@ -15,9 +15,6 @@ namespace CommandLineParser.Tests
 
             [Option('t', "test")]
             public int AnotherTest { get; set; }
-
-            [Value(0, "min")]
-            public int Min { get; set; }
         }
 
         class ArgumentsWithList
@@ -55,13 +52,12 @@ namespace CommandLineParser.Tests
         [Fact]
         public void ParseMultipleProperties()
         {
-            var args = new[] { "4", "-i", "4", "-t", "10" };
+            var args = new[] { "-i", "4", "-t", "10" };
             var parser = new Parser();
             parser.Register<Arguments>(arguments =>
                 {
                     Assert.Equal(arguments.Test, 4);
                     Assert.Equal(arguments.AnotherTest, 10);
-                    Assert.Equal(arguments.Min, 4);
                 })
                 .Parse(args);
         }

@@ -5,6 +5,7 @@
         Option,
         Value,
         Flag,
-        EndOfList
+        Command,
+        EndOfList,
     }
 }

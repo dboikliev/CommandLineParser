@@ -7,29 +7,34 @@ namespace CommandLineParser.Tokens
     {
         private readonly HashSet<string> _optionNames;
         private readonly HashSet<string> _flagNames;
+        private readonly HashSet<string> _commandNames;
 
-        public Tokenizer(HashSet<string> optionNames, HashSet<string> flagNames)
+        public Tokenizer(HashSet<string> optionNames, 
+            HashSet<string> flagNames, 
+            HashSet<string> commandNames)
         {
             _optionNames = optionNames;
             _flagNames = flagNames;
+            _commandNames = commandNames;
         }
 
         public IEnumerable<Token> Tokenize(string[] args)
         {
+            //yield return new Token(TokenType.Command, -1);
             for (int i = 0; i < args.Length; i++)
             {
                 var argument = args[i];
                 if (IsEndOfList(argument))
                 {
-                    yield return new Token(TokenType.EndOfList, i);
+                    yield return new Token(TokenType.EndOfList);
                 }
                 else if (IsOption(argument))
                 {
-                    yield return new Token(TokenType.Option, i, Normalize(argument));
+                    yield return new Token(TokenType.Option, Normalize(argument));
                 }
                 else if (IsSingleFlag(argument))
                 {
-                    yield return new Token(TokenType.Flag, i, Normalize(argument));
+                    yield return new Token(TokenType.Flag, Normalize(argument));
                 }
                 else if (IsMultiFlag(argument))
                 {
@@ -38,13 +43,17 @@ namespace CommandLineParser.Tokens
                     {
                         foreach (char flag in normalized)
                         {
-                            yield return new Token(TokenType.Flag, i, flag.ToString());
+                            yield return new Token(TokenType.Flag, flag.ToString());
                         }
                     }
                 }
+                else if (IsCommand(argument))
+                {
+                    yield return new Token(TokenType.Command, argument);
+                }
                 else 
                 {
-                    yield return new Token(TokenType.Value, i, Normalize(argument));
+                    yield return new Token(TokenType.Value, Normalize(argument));
                 }
             }
         }
@@ -54,26 +63,32 @@ namespace CommandLineParser.Tokens
             return argument.Length == 2 
                 && argument.StartsWith("--");
         }
-        public bool IsOption(string argument)
+        private bool IsOption(string argument)
         {
             return (argument.Length == 2 && argument.StartsWith("-")
                    || argument.Length > 2 && argument.StartsWith("--"))
                    && _optionNames.Contains(Normalize(argument));
         }
 
-        public bool IsSingleFlag(string argument)
+        private bool IsSingleFlag(string argument)
         {
             return (argument.Length == 2 && argument.StartsWith("-")
                  || argument.Length == 3 && argument.StartsWith("--"))
                  && _flagNames.Contains(Normalize(argument));
         }
 
-        public bool IsMultiFlag(string argument)
+        private bool IsMultiFlag(string argument)
         {
             return argument.Length > 2 
                  && argument.StartsWith("-")
                  && argument.Substring(1).All(f => _flagNames.Contains(f.ToString()));
         }
+
+        private bool IsCommand(string argument)
+        {
+            return _commandNames.Contains(argument);
+        }
+
         
         private static string Normalize(string value)
         {
