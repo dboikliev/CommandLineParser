@@ -7,7 +7,7 @@ namespace CommandLineParser.TypeParsers
     {
         public override int Parse(ParsedArgument argument)
         {
-            return int.Parse(argument.Values.FirstOrDefault());
+            return int.Parse(argument.Values.First());
         }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using CommandLineParser.Attributes;
 
@@ -8,22 +10,34 @@ namespace CommandLineParser.TestClient
     {
         public static void Main(string[] args)
         {
-            //args = new[] { "--input", @"D:\in.txt", "--output", @"D:\out.txt" };
+            args = new[] { "head", "sda"};
+            var sw  = new Stopwatch();
+            sw.Start();
             var parser = new Parser();
-            parser.Register<Arguments>(arguments =>
+            parser.Register<IOptions>(arguments =>
             {
-                Console.WriteLine(arguments.Input);
-                Console.WriteLine(arguments.Output);
+                Console.WriteLine(arguments.FileName);
             }).Parse(args);
+            sw.Stop();
+            Console.WriteLine(sw.Elapsed);
         }
     }
 
-    class Arguments
-    {
-        [Option('i', "input")]
-        public FileInfo Input { get; set; }
+    [Command("head")]
 
-        [Option('o', "output")]
-        public FileInfo Output { get; set; }
+    class IOptions
+    {
+        [Option('n', "lines")]
+        public int Lines { get; set; }
+
+        [Option('c', "bytes")]
+        public int Bytes { get; set; }
+
+        [Option('q', "quiet")]
+        public bool Quiet { get; set; }
+
+        [Value(0, "dsa")]
+        public string FileName { get; set; }
     }
+
 }

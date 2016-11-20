@@ -8,7 +8,7 @@ namespace CommandLineParser.TypeParsers
     {
         public override FileInfo Parse(ParsedArgument argument)
         {
-           return new FileInfo(argument.Values.FirstOrDefault());
+           return new FileInfo(argument.Values.First());
         }
     }
 }

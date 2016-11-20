@@ -8,7 +8,7 @@ namespace CommandLineParser.TypeParsers
     {
         public override Enum Parse(ParsedArgument argument)
         {
-            return (Enum)Enum.Parse(argument.Type, argument.Values.FirstOrDefault(), true);
+            return (Enum)Enum.Parse(argument.Type, argument.Values.First(), true);
         }
     }
 }

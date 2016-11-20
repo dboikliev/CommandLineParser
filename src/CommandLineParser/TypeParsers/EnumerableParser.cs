@@ -7,17 +7,19 @@ namespace CommandLineParser.TypeParsers
     public sealed class EnumerableValueParser<T> : ITypedEnumerableParser<T>
     {
         private readonly ParserFactory _parserFactory = new ParserFactory();
+        private readonly ITypedParser _parser;
+        public EnumerableValueParser()
+        {
+            _parser = _parserFactory[typeof(T)];
+        }
 
         public IEnumerable<T> Parse(ParsedArgument argument)
         {
-            foreach (var value in argument.Values)
+            return argument.Values.Select(value => (T)_parser.Parse(new ParsedArgument
             {
-                yield return (T)_parserFactory[typeof(T)].Parse(new ParsedArgument
-                {
-                    Type = argument.Type.GenericTypeArguments.First(),
-                    Values = new [] { value }
-                });
-            }
+                Type = argument.Type.GenericTypeArguments.First(),
+                Values = new [] { value }
+            }));
         }
 
         object ITypedParser.Parse(ParsedArgument argument)

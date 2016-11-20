@@ -64,5 +64,20 @@ namespace CommandLineParser.Tests
             });
             parser.Parse(args);
         }
+
+        [Fact]
+        public void ParseCommand()
+        {
+            var args = new[] { "command", "1", "2", "-i", "innerTest", "--", "3" };
+            var parser = new Parser();
+            parser.Register<CommandArguments>(commandArgs =>
+            {
+                Assert.Equal(commandArgs.Foo, 1);
+                Assert.Equal(commandArgs.Bar, 2);
+                Assert.Equal(commandArgs.Moo, 3);
+                Assert.Equal(commandArgs.InnerOption, "innerTest");
+            });
+            parser.Parse(args);
+        }
     }
 }
