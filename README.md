@@ -15,10 +15,10 @@ Define a class which will hold the parsed arguments:
 class Arguments
 {
     [Option('i', "input")]
-    public FileInfo Input { get; set; }
+    public string Input { get; set; }
 
     [Option('o', "output")]
-    public FileInfo Output { get; set; }
+    public string Output { get; set; }
 }
 ```
 
@@ -45,3 +45,5 @@ Result:
 D:\input.txt
 D:\output.txt
 ```
+
+###2. Options
