@@ -16,7 +16,6 @@ class Arguments
 {
     [Option('i', "input")]
     public string Input { get; set; }
-
     [Option('o', "output")]
     public string Output { get; set; }
 }
