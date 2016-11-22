@@ -147,13 +147,26 @@ namespace CommandLineParser
             var tokens = tokenizer.Tokenize(args).ToArray();
             Parse(tokens);
             EvaluateRemainingProperties();
+            ExecuteCallbacks();
         }
 
-        private void EvaluateRemainingProperties()
+        private void ExecuteCallbacks()
         {
             while (_parsedCommands.Count > 0)
             {
                 var commandName = _parsedCommands.Dequeue();
+                if (_commandArguments.ContainsKey(commandName))
+                {
+                    var arguments = _commandArguments[commandName];
+                    _argumentCallbacks[arguments.GetType()].DynamicInvoke(arguments);
+                }
+            }
+        }
+
+        private void EvaluateRemainingProperties()
+        {
+            foreach (var commandName in _parsedCommands)
+            {
                 if (_commandArguments.ContainsKey(commandName))
                 {
                     var commandArgumentProperties = _argumentProperties[commandName];
@@ -168,8 +181,8 @@ namespace CommandLineParser
                             {
                                 if (attribute.IsRequired)
                                 {
-                                    throw new Exception(
-                                        $"A value was not provided for a required option with name {attribute.LongName}");
+                                    throw new MissingRequiredOptionException(attribute.ShortName,
+                                        attribute.LongName);
                                 }
 
                                 if (attribute.DefaultValue != null)
@@ -180,6 +193,7 @@ namespace CommandLineParser
                                 }
                             }
                         }
+
                     }
 
 
@@ -191,8 +205,7 @@ namespace CommandLineParser
                             var attribute = (ValueAttribute)valueProperty.Argument;
                             if (attribute.IsRequired)
                             {
-                                throw new Exception(
-                                    $"A value was not provided for  {attribute.Name}");
+                                throw new MissingRequiredPositionalValueException(attribute.Name);
                             }
 
                             if (attribute.DefaultValue != null)
@@ -203,9 +216,6 @@ namespace CommandLineParser
                             }
                         }
                     }
-
-                    var arguments = _commandArguments[commandName];
-                    _argumentCallbacks[arguments.GetType()].DynamicInvoke(arguments);
                 }
             }
         }
@@ -275,7 +285,7 @@ namespace CommandLineParser
 
             if (!optionArgument.Values.Any())
             {
-                throw new MissingValueForOption(optionArgument.Name);
+                throw new MissingValueForOptionException(optionArgument.Name);
             }
 
             var parser = _parserFactory.GetParser(optionArgument.Type);

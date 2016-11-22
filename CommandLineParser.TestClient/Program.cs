@@ -10,7 +10,7 @@ namespace CommandLineParser.TestClient
     {
         public static void Main(string[] args)
         {
-            args = new[] { "test"};
+            args = new[] { "test", "100"};
             var parser = new Parser();
             parser.Register<Arguments>(arguments =>
             {
@@ -30,7 +30,7 @@ namespace CommandLineParser.TestClient
     {
         [Option('i', "input", IsRequired = false, DefaultValue = 10)]
         public int Input { get; set; }
-        [Value(0, "min", DefaultValue = 500)]
+        [Value(0, "min", IsRequired = true)]
         public int Value { get; set; }
     }
 
