@@ -15,6 +15,7 @@ namespace CommandLineParser.TestClient
             parser.Register<Arguments>(arguments =>
             {
                 Console.WriteLine(arguments.Input);
+                Console.WriteLine(arguments.Value);
             }).Register<Arguments2>(arguments =>
             {
                 Console.WriteLine(arguments.Lines);
@@ -27,8 +28,10 @@ namespace CommandLineParser.TestClient
 
     class Arguments
     {
-        [Option('i', "input", IsRequired = true, DefaultValue = 10)]
+        [Option('i', "input", IsRequired = false, DefaultValue = 10)]
         public int Input { get; set; }
+        [Value(0, "min", DefaultValue = 500)]
+        public int Value { get; set; }
     }
 
     [Command("bla")]

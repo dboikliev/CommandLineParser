@@ -161,7 +161,6 @@ namespace CommandLineParser
                     foreach (var commandArgumentProperty in commandArgumentProperties)
                     {
                         var argumentProperty = commandArgumentProperty.Value;
-
                         if (argumentProperty.Argument is OptionAttribute)
                         {
                             var attribute = ((OptionAttribute)argumentProperty.Argument);
@@ -181,22 +180,26 @@ namespace CommandLineParser
                                 }
                             }
                         }
-                        else if (argumentProperty.Argument is ValueAttribute)
+                    }
+
+
+                    while (_valueProperties.ContainsKey(commandName) && _valueProperties[commandName].Count > 0)
+                    {
+                        var valueProperty = _valueProperties[commandName].Dequeue();
+                        if (!valueProperty.Evaluated)
                         {
-                            var attribute = ((ValueAttribute)argumentProperty.Argument);
-                            if (!argumentProperty.Evaluated)
+                            var attribute = (ValueAttribute)valueProperty.Argument;
+                            if (attribute.IsRequired)
                             {
-                                if (attribute.IsRequired)
-                                {
-                                    throw new Exception(
-                                        $"A value was not provided for a required positional value with name {attribute.Name}");
-                                }
-                                if (attribute.DefaultValue != null)
-                                {
-                                    var commandArguments = _commandArguments[commandName];
-                                    argumentProperty.Property.SetValue(commandArguments,
-                                        attribute.DefaultValue);
-                                }
+                                throw new Exception(
+                                    $"A value was not provided for  {attribute.Name}");
+                            }
+
+                            if (attribute.DefaultValue != null)
+                            {
+                                var commandArguments = _commandArguments[commandName];
+                                valueProperty.Property.SetValue(commandArguments,
+                                    attribute.DefaultValue);
                             }
                         }
                     }
