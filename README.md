@@ -46,7 +46,7 @@ D:\output.txt
 ```
 
 ###2. Options
-Options can be places on properties with different types. 
+Options can be placed on properties with different types. 
 The current supported types are Int32, String, FileInfo, Boolean and user defined Enums.
 IEnumerable of all of those types is also supported.
 
