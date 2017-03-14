@@ -7,9 +7,9 @@ A library for parsing command line arguments. Written in C#, based on .NET Core.
 - Bool flags
 - Commands
 
-##Examples
+## Examples
 
-###1. Registering types and parsing
+### 1. Registering types and parsing
 Define a class which will hold the parsed arguments:
 ```csharp
 class Arguments
@@ -45,7 +45,7 @@ D:\input.txt
 D:\output.txt
 ```
 
-###2. Options
+### 2. Options
 Options can be placed on properties with different types. 
 The current supported types are Int32, String, FileInfo, Boolean and user defined Enums.
 IEnumerable of all of those types is also supported.
@@ -92,4 +92,4 @@ True
 1, 2, 3, 4, 5
 ```
 
-###3. ...
+### 3. ...
