@@ -26,11 +26,12 @@ namespace CommandLineParser.Tests
             var args = new[] { "-a", "True" };
             var parser = new Parser();
 
-            parser.Register<ArgumentsWithBoolean>(arguments =>
-            {
-                Assert.True(arguments.IsActive);
-            })
-            .Parse(args);
+            parser
+                .Register<ArgumentsWithBoolean>(arguments =>
+                {
+                    Assert.True(arguments.IsActive);
+                })
+                .Parse(args);
         }
 
         [Fact]
@@ -39,11 +40,12 @@ namespace CommandLineParser.Tests
             var args = new[] { "-l", "-d" };
             var parser = new Parser();
 
-            parser.Register<ArgumentsWithMultipleBooleanProperties>(arguments =>
-            {
-                Assert.True(arguments.Log);
-                Assert.True(arguments.Delete);
-            })
+            parser
+                .Register<ArgumentsWithMultipleBooleanProperties>(arguments =>
+                {
+                    Assert.True(arguments.Log);
+                    Assert.True(arguments.Delete);
+                })
                 .Parse(args);
         }
     }

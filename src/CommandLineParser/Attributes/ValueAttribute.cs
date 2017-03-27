@@ -1,5 +1,8 @@
-﻿namespace CommandLineParser.Attributes
+﻿using System;
+
+namespace CommandLineParser.Attributes
 {
+    [AttributeUsage(AttributeTargets.Property)]
     public sealed class ValueAttribute : ArgumentAttribute
     {
         public string Name { get; }

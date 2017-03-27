@@ -1,6 +1,9 @@
-﻿namespace CommandLineParser.Attributes
+﻿using System;
+
+namespace CommandLineParser.Attributes
 {
-    public class FlagAttribute : ArgumentAttribute
+    [AttributeUsage(AttributeTargets.Property)]
+    public sealed class FlagAttribute : ArgumentAttribute
     {
         public string ShortName { get; }
         public string LongName { get; }

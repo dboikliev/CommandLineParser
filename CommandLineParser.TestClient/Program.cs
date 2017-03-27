@@ -1,8 +1,5 @@
 ﻿using CommandLineParser.Attributes;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 
 namespace CommandLineParser.TestClient
 {
@@ -10,35 +7,25 @@ namespace CommandLineParser.TestClient
     {
         public static void Main(string[] args)
         {
-            args = new[] { "test", "100"};
+            args = new[] { "test", "--help" };
             var parser = new Parser();
             parser.Register<Arguments>(arguments =>
             {
                 Console.WriteLine(arguments.Input);
                 Console.WriteLine(arguments.Value);
-            }).Register<Arguments2>(arguments =>
-            {
-                Console.WriteLine(arguments.Lines);
             })
             .Parse(args);
         }
     }
 
-    [Command("test")]
-
-    class Arguments
+    [Command("test", Description = "Command used for testing my command line parser.")]
+    internal class Arguments
     {
-        [Option('i', "input", IsRequired = false, DefaultValue = 10)]
+        [Option('i', "input", IsRequired = true, DefaultValue = 10, Description = "Input option")]
         public int Input { get; set; }
-        [Value(0, "min", IsRequired = true)]
-        public int Value { get; set; }
-    }
-
-    [Command("bla")]
-
-    class Arguments2
-    {
-        [Option('n', "lines")]
+        [Option('n', "lines", IsRequired = true, Description = "Lines option")]
         public int Lines { get; set; }
+        [Value(0, "min", IsRequired = true, Description = "Min value")]
+        public int Value { get; set; }
     }
 }

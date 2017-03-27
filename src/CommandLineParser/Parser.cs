@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using CommandLineParser.Attributes;
 using CommandLineParser.Exceptions;
 using CommandLineParser.ParsedArguments;
@@ -25,7 +26,6 @@ namespace CommandLineParser
         private readonly Dictionary<string, Queue<ArgumentProperty>> _valueProperties =
             new Dictionary<string, Queue<ArgumentProperty>>();
 
-
         private readonly Dictionary<string, Dictionary<string, ArgumentProperty>> _argumentProperties =
             new Dictionary<string, Dictionary<string, ArgumentProperty>>();
 
@@ -33,6 +33,8 @@ namespace CommandLineParser
 
         private readonly Dictionary<string, object> _commandArguments =
             new Dictionary<string, object>();
+
+        private readonly Dictionary<string, string> _commandHelp = new Dictionary<string, string>();
 
         private readonly Queue<string> _parsedCommands = new Queue<string>();
 
@@ -52,11 +54,15 @@ namespace CommandLineParser
                 throw new MultipleTopLevelArgumentsNotAllowedException();
             }
             var currentCommand = string.Empty;
+            var currentCommandHelp = new StringBuilder();
+
             if (commandAttribute == null)
             {
                 _commandNames.Add(string.Empty);
                 _commandArguments[string.Empty] = new T();
                 _currentArguments = _commandArguments[string.Empty];
+                currentCommandHelp.AppendLine($"Displaying help for application");
+                currentCommandHelp.AppendLine();
             }
             else
             {
@@ -67,6 +73,10 @@ namespace CommandLineParser
                 _commandNames.Add(commandAttribute.Name);
                 _commandArguments[commandAttribute.Name] = new T();
                 currentCommand = commandAttribute.Name;
+                currentCommandHelp.AppendLine(
+                    $"Displaying help for command \"{currentCommand}\": {commandAttribute.Description}");
+                currentCommandHelp.AppendLine();
+                //currentCommandHelp.AppendLine($"{currentCommand, -30} {commandAttribute.Description}");
             }
 
             var properties = argumentsType
@@ -75,8 +85,7 @@ namespace CommandLineParser
 
             foreach (var property in properties)
             {
-                var argumentAttributes = property.GetCustomAttributes<ArgumentAttribute>()
-                    .ToArray();
+                var argumentAttributes = property.GetCustomAttributes<ArgumentAttribute>().ToArray();
                 if (argumentAttributes.Length > 1)
                 {
                     throw new MultipleArgumentAttributesNotAllowedException();
@@ -98,41 +107,45 @@ namespace CommandLineParser
                         Property = property
                     };
 
-                    if (attribute is OptionAttribute)
+                    if (attribute is OptionAttribute option)
                     {
-                        var option = (OptionAttribute)attribute;
-
                         _optionNames.Add(option.ShortName);
                         _optionNames.Add(option.LongName);
 
                         _argumentProperties[currentCommand][option.ShortName] = argumentProperty;
                         _argumentProperties[currentCommand][option.LongName] = argumentProperty;
+
+                        currentCommandHelp.AppendLine($"\t{ "-" + option.ShortName + " | --" + option.LongName, -30 } { option.Description }");
                     }
-                    else if (attribute is FlagAttribute)
+                    else if (attribute is FlagAttribute flag)
                     {
                         if (property.PropertyType != typeof(bool))
                         {
                             throw new InvalidAttributeUsageException($"{nameof(FlagAttribute)} can only be used on boolean properties.");
                         }
-                        var flag = (FlagAttribute)attribute;
+
                         _flagNames.Add(flag.ShortName);
                         _flagNames.Add(flag.LongName);
+
                         _argumentProperties[currentCommand][flag.ShortName] = argumentProperty;
                         _argumentProperties[currentCommand][flag.LongName] = argumentProperty;
+
+                        currentCommandHelp.AppendLine($"\t{ "-" + flag.ShortName + " | --" + flag.LongName, -30 } { flag.Description }");
                     }
-                    else if (attribute is ValueAttribute)
+                    else if (attribute is ValueAttribute value)
                     {
-                        var value = (ValueAttribute)attribute;
                         _valueNames.Add(value.Name);
                         if (!_valueProperties.ContainsKey(currentCommand))
                         {
                             _valueProperties[currentCommand] = new Queue<ArgumentProperty>();
                         }
                         _valueProperties[currentCommand].Enqueue(argumentProperty);
+                        currentCommandHelp.AppendLine($"\t{ value.Name, -30 } { value.Description }");
                     }
                 }
             }
 
+            _commandHelp[currentCommand] = currentCommandHelp.ToString();
             _argumentCallbacks[typeof(T)] = callback;
             return this;
         }
@@ -145,9 +158,20 @@ namespace CommandLineParser
         {
             var tokenizer = new Tokenizer(_optionNames, _flagNames, _commandNames);
             var tokens = tokenizer.Tokenize(args).ToArray();
-            Parse(tokens);
-            EvaluateRemainingProperties();
-            ExecuteCallbacks();
+            try
+            {
+                Parse(tokens);
+                EvaluateRemainingProperties();
+                ExecuteCallbacks();
+            }
+            catch (HelpException ex)
+            {
+                Console.WriteLine(_commandHelp[ex.CommandName]);
+            }
+            catch (Exception ex) when (ex is MissingRequiredPositionalValueException || ex is MissingRequiredOptionException || ex is RepeatingArgumentsException)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
 
         private void ExecuteCallbacks()
@@ -174,28 +198,22 @@ namespace CommandLineParser
                     foreach (var commandArgumentProperty in commandArgumentProperties)
                     {
                         var argumentProperty = commandArgumentProperty.Value;
-                        if (argumentProperty.Argument is OptionAttribute)
+                        if (argumentProperty.Argument is OptionAttribute attribute && !argumentProperty.Evaluated)
                         {
-                            var attribute = ((OptionAttribute)argumentProperty.Argument);
-                            if (!argumentProperty.Evaluated)
+                            if (attribute.IsRequired)
                             {
-                                if (attribute.IsRequired)
-                                {
-                                    throw new MissingRequiredOptionException(attribute.ShortName,
-                                        attribute.LongName);
-                                }
+                                throw new MissingRequiredOptionException(attribute.ShortName,
+                                    attribute.LongName);
+                            }
 
-                                if (attribute.DefaultValue != null)
-                                {
-                                    var commandArguments = _commandArguments[commandName];
-                                    argumentProperty.Property.SetValue(commandArguments,
-                                        attribute.DefaultValue);
-                                }
+                            if (attribute.DefaultValue != null)
+                            {
+                                var commandArguments = _commandArguments[commandName];
+                                argumentProperty.Property.SetValue(commandArguments,
+                                    attribute.DefaultValue);
                             }
                         }
-
                     }
-
 
                     while (_valueProperties.ContainsKey(commandName) && _valueProperties[commandName].Count > 0)
                     {
@@ -220,35 +238,36 @@ namespace CommandLineParser
             }
         }
 
-        private void Parse(Token[] tokens, string commandName = "")
+        private void Parse(IReadOnlyList<Token> tokens, string commandName = "")
         {
             _parsedCommands.Enqueue(commandName);
-            while (_currentPosition < tokens.Length)
+            while (_currentPosition < tokens.Count)
             {
-                if (tokens[_currentPosition].Type == TokenType.Command)
+                switch (tokens[_currentPosition].Type)
                 {
-                    commandName = tokens[_currentPosition].Value;
-                    _currentArguments = _commandArguments[commandName];
-                    _currentPosition++;
-                    Parse(tokens, commandName);
-                }
-                else if (tokens[_currentPosition].Type == TokenType.Option)
-                {
-                    var option = ParseOption(tokens);
-                    option.CommandName = commandName;
-                    EvaluateOption(option);
-                }
-                else if (tokens[_currentPosition].Type == TokenType.Flag)
-                {
-                    var flag = ParseFlag(tokens);
-                    flag.CommandName = commandName;
-                    EvaluateFlag(flag);
-                }
-                else if (tokens[_currentPosition].Type == TokenType.Value)
-                {
-                    var value = ParseValue(tokens);
-                    value.CommandName = commandName;
-                    EvaluateValue(value);
+                    case TokenType.Command:
+                        commandName = tokens[_currentPosition].Value;
+                        _currentArguments = _commandArguments[commandName];
+                        _currentPosition++;
+                        Parse(tokens, commandName);
+                        break;
+                    case TokenType.Option:
+                        var option = ParseOption(tokens);
+                        option.CommandName = commandName;
+                        EvaluateOption(option);
+                        break;
+                    case TokenType.Flag:
+                        var flag = ParseFlag(tokens);
+                        flag.CommandName = commandName;
+                        EvaluateFlag(flag);
+                        break;
+                    case TokenType.Value:
+                        var value = ParseValue(tokens);
+                        value.CommandName = commandName;
+                        EvaluateValue(value);
+                        break;
+                    case TokenType.Help:
+                        throw new HelpException(commandName);
                 }
                 _currentPosition++;
             }
@@ -294,7 +313,7 @@ namespace CommandLineParser
             argumentProperty.Evaluated = true;
         }
 
-        private ParsedArgument ParseValue(Token[] tokens)
+        private ParsedArgument ParseValue(IReadOnlyList<Token> tokens)
         {
             var token = tokens[_currentPosition];
             var parsedValue = new ParsedArgument
@@ -304,13 +323,13 @@ namespace CommandLineParser
             return parsedValue;
         }
 
-        private ParsedArgument ParseOption(Token[] tokens)
+        private ParsedArgument ParseOption(IReadOnlyList<Token> tokens)
         {
             var token = tokens[_currentPosition];
             var parsedOption = new ParsedArgument { Name = token.Value };
             var values = new List<string>();
 
-            while (_currentPosition + 1 < tokens.Length && tokens[_currentPosition + 1].Type == TokenType.Value)
+            while (_currentPosition + 1 < tokens.Count && tokens[_currentPosition + 1].Type == TokenType.Value)
             {
                 _currentPosition++;
                 token = tokens[_currentPosition];
@@ -321,7 +340,7 @@ namespace CommandLineParser
             return parsedOption;
         }
 
-        private ParsedArgument ParseFlag(Token[] tokens)
+        private ParsedArgument ParseFlag(IReadOnlyList<Token> tokens)
         {
             var token = tokens[_currentPosition];
             var parsedOption = new ParsedArgument { Name = token.Value };

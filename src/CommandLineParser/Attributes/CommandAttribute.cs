@@ -3,7 +3,7 @@
 namespace CommandLineParser.Attributes
 {
     [AttributeUsage(AttributeTargets.Class)]
-    public class CommandAttribute : Attribute
+    public sealed class CommandAttribute : ArgumentAttribute
     {
         public string Name { get; }
 

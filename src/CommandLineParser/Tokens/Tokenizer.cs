@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace CommandLineParser.Tokens
@@ -51,11 +52,20 @@ namespace CommandLineParser.Tokens
                 {
                     yield return new Token(TokenType.Command, argument);
                 }
+                else if (IsHelp(argument))
+                {
+                    yield return new Token(TokenType.Help, argument);
+                }
                 else 
                 {
                     yield return new Token(TokenType.Value, Normalize(argument));
                 }
             }
+        }
+
+        private bool IsHelp(string argument)
+        {
+            return argument == "--help";
         }
 
         private bool IsEndOfList(string argument)

@@ -7,5 +7,6 @@
         Flag,
         Command,
         EndOfList,
+        Help,
     }
 }

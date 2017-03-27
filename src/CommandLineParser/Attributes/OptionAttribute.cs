@@ -1,5 +1,8 @@
-﻿namespace CommandLineParser.Attributes
+﻿using System;
+
+namespace CommandLineParser.Attributes
 {
+    [AttributeUsage(AttributeTargets.Property)]
     public sealed class OptionAttribute : ArgumentAttribute
     {
         public string ShortName { get; }
