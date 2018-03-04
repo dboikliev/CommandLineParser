@@ -67,6 +67,7 @@ namespace CommandLineParser
                 {
                     throw new InvalidOperationException($"Command whith name {commandAttribute.Name} has already been registered.");
                 }
+
                 _commandNames.Add(commandAttribute.Name);
                 _commandArguments[commandAttribute.Name] = new T();
                 currentCommand = commandAttribute.Name;
@@ -270,6 +271,8 @@ namespace CommandLineParser
                         break;
                     case TokenType.Help when tokens[_currentPosition - 1].Type == TokenType.Command:
                         PrintHelp(commandName);
+                        _currentPosition = tokens.Count;
+                        _parsedCommands.Clear();
                         break;
                 }
                 _currentPosition++;
