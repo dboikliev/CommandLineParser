@@ -79,7 +79,6 @@ namespace CommandLineParser
             var enumerableKey =
                 typeof(IEnumerable<>).MakeGenericType(type);
             TypedParsers[enumerableKey] = lazyEnumerableParser;
-
         }
     }
 }

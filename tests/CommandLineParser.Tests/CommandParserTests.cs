@@ -10,6 +10,7 @@ namespace CommandLineParser.Tests
         [Value(0, "max")]
         public int Max { get; set; }
     }
+
     [Command("command")]
     class CommandArguments
     {
@@ -34,14 +35,17 @@ namespace CommandLineParser.Tests
         {
             var args = new[] { "-t", "test", "command", "-i", "innerTest" };
             var parser = new Parser();
+
             parser.Register<Arguments>(arguments =>
             {
                 Assert.Equal(arguments.Test, "test");
             });
+
             parser.Register<CommandArguments>(commandArgs =>
             {
                 Assert.Equal(commandArgs.InnerOption, "innerTest");
             });
+
             parser.Parse(args);
         }
 

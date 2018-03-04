@@ -4,6 +4,6 @@ namespace CommandLineParser.Attributes
 {
     public abstract class ArgumentAttribute : Attribute
     {
-        public string Description { get; set; }
+        public string Description { get; set; } = string.Empty;
     }
 }

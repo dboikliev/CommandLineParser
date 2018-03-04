@@ -1,5 +1,5 @@
-﻿using CommandLineParser.Attributes;
-using System;
+﻿using System;
+using CommandLineParser.Attributes;
 
 namespace CommandLineParser.TestClient
 {
@@ -8,7 +8,7 @@ namespace CommandLineParser.TestClient
         public static void Main(string[] args)
         {
             args = new[] { "test", "--help" };
-            var parser = new Parser();
+            var parser = new Parser(new Options('-', "--"));
             parser.Register<Arguments>(arguments =>
             {
                 Console.WriteLine(arguments.Input);

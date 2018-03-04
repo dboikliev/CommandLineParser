@@ -7,8 +7,7 @@ namespace CommandLineParser.TypeParsers
     {
         public override bool Parse(ParsedArgument argument)
         {
-            var value = argument.Values.First();
-            return bool.Parse(value);
+            return bool.Parse(argument.Values.First());
         }
     }
 }
