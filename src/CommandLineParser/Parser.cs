@@ -162,8 +162,8 @@ namespace CommandLineParser
         /// <param name="args">The command line arguments</param>
         public void Parse(string[] args)
         {
-            var tokenizer = new Tokenizer(_options, _optionNames, _flagNames, _commandNames);
-            var tokens = tokenizer.Tokenize(args).ToArray();
+            var tokenizer = new Lexer(_options, _optionNames, _flagNames, _commandNames);
+            var tokens = tokenizer.Tokenize(args).ToList();
             try
             {
                 Parse(tokens);
@@ -249,7 +249,7 @@ namespace CommandLineParser
                 switch (tokens[_currentPosition].Type)
                 {
                     case TokenType.Command:
-                        commandName = tokens[_currentPosition].Value;
+                        commandName = tokens[_currentPosition].Symbol;
                         _currentArguments = _commandArguments[commandName];
                         _currentPosition++;
                         Parse(tokens, commandName);
@@ -293,7 +293,6 @@ namespace CommandLineParser
             }
             argumentProperty.Property.SetValue(_currentArguments, true);
             argumentProperty.Evaluated = true;
-
         }
 
         private void EvaluateValue(ParsedArgument valueArgument)
@@ -329,7 +328,7 @@ namespace CommandLineParser
             var token = tokens[_currentPosition];
             var parsedValue = new ParsedArgument
             {
-                Values = new[] { token.Value },
+                Values = new[] { token.Symbol },
             };
             return parsedValue;
         }
@@ -337,14 +336,14 @@ namespace CommandLineParser
         private ParsedArgument ParseOption(IReadOnlyList<Token> tokens)
         {
             var token = tokens[_currentPosition];
-            var parsedOption = new ParsedArgument { Name = token.Value };
+            var parsedOption = new ParsedArgument { Name = token.Symbol };
             var values = new List<string>();
 
             while (_currentPosition + 1 < tokens.Count && tokens[_currentPosition + 1].Type == TokenType.Value)
             {
                 _currentPosition++;
                 token = tokens[_currentPosition];
-                values.Add(token.Value);
+                values.Add(token.Symbol);
             }
 
             parsedOption.Values = values;
@@ -354,7 +353,7 @@ namespace CommandLineParser
         private ParsedArgument ParseFlag(IReadOnlyList<Token> tokens)
         {
             var token = tokens[_currentPosition];
-            var parsedOption = new ParsedArgument { Name = token.Value };
+            var parsedOption = new ParsedArgument { Name = token.Symbol };
             return parsedOption;
         }
     }

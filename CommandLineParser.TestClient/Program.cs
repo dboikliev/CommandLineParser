@@ -9,12 +9,13 @@ namespace CommandLineParser.TestClient
         {
             args = new[] { "test", "--help" };
             var parser = new Parser(new Options('-', "--"));
-            parser.Register<Arguments>(arguments =>
-            {
-                Console.WriteLine(arguments.Input);
-                Console.WriteLine(arguments.Value);
-            })
-            .Parse(args);
+            parser
+                .Register<Arguments>(arguments =>
+                {
+                    Console.WriteLine(arguments.Input);
+                    Console.WriteLine(arguments.Value);
+                })
+                .Parse(args);
         }
     }
 

@@ -4,14 +4,14 @@ using CommandLineParser.Extensions;
 
 namespace CommandLineParser.Tokens
 {
-    public class Tokenizer
+    public class Lexer
     {
         private readonly Options _options;
         private readonly HashSet<string> _optionNames;
         private readonly HashSet<string> _flagNames;
         private readonly HashSet<string> _commandNames;
 
-        public Tokenizer(Options options,
+        public Lexer(Options options,
             HashSet<string> optionNames,
             HashSet<string> flagNames,
             HashSet<string> commandNames)
@@ -24,20 +24,19 @@ namespace CommandLineParser.Tokens
 
         public IEnumerable<Token> Tokenize(string[] args)
         {
-            //yield return new Token(TokenType.Command, -1);
             foreach (var argument in args)
             {
                 if (IsEndOfList(argument))
                 {
-                    yield return new Token(TokenType.EndOfList);
+                    yield return Token.EndOfList();
                 }
                 else if (IsOption(argument))
                 {
-                    yield return new Token(TokenType.Option, Normalize(argument));
+                    yield return Token.Option(Normalize(argument));
                 }
                 else if (IsSingleFlag(argument))
                 {
-                    yield return new Token(TokenType.Flag, Normalize(argument));
+                    yield return Token.Flag(Normalize(argument));
                 }
                 else if (IsMultiFlag(argument))
                 {
@@ -46,21 +45,21 @@ namespace CommandLineParser.Tokens
                     {
                         foreach (char flag in normalized)
                         {
-                            yield return new Token(TokenType.Flag, flag.ToString());
+                            yield return Token.Flag(flag.ToString());
                         }
                     }
                 }
                 else if (IsCommand(argument))
                 {
-                    yield return new Token(TokenType.Command, argument);
+                    yield return Token.Command(argument);
                 }
                 else if (IsHelp(argument))
                 {
-                    yield return new Token(TokenType.Help, argument);
+                    yield return Token.Help();
                 }
                 else
                 {
-                    yield return new Token(TokenType.Value, Normalize(argument));
+                    yield return Token.Value(Normalize(argument));
                 }
             }
         }
@@ -83,18 +82,20 @@ namespace CommandLineParser.Tokens
              argument.Length == _options.LongPrefix.Length + 1 && argument.StartsWith(_options.LongPrefix)) &&
             _flagNames.Contains(Normalize(argument));
 
-        private bool IsMultiFlag(string argument)
-        {
-            return argument.Length > 2
-                 && argument.StartsWith(_options.ShortPrefix)
-                 && argument.Skip(1).All(f => _flagNames.Contains(f.ToString()));
-        }
+        private bool IsMultiFlag(string argument) =>
+            argument.Length > 2 &&
+            argument.StartsWith(_options.ShortPrefix) &&
+            argument.Skip(1).All(f => _flagNames.Contains(f.ToString()));
 
         private bool IsCommand(string argument) => _commandNames.Contains(argument);
 
-
         private string Normalize(string value)
         {
+            if (value.StartsWith(_options.LongPrefix))
+            {
+                return value.TrimStart(_options.LongPrefix);
+            }
+
             return value.TrimStart(_options.ShortPrefix);
         }
     }
