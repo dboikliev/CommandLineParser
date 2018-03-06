@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netstandard1.6</TargetFramework>
     <AssemblyName>CommandLineParser</AssemblyName>
@@ -10,14 +9,11 @@
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DefineConstants>TRACE;RELEASE;NETSTANDARD1_6</DefineConstants>
     <OutputPath>bin\Release\netstandard1.6\</OutputPath>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="System.Reflection.Extensions" Version="4.3.0" />
   </ItemGroup>
-
 </Project>
