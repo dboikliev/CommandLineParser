@@ -307,6 +307,7 @@ namespace CommandLineParser
             {
                 throw new RepeatingArgumentsException($"Argument {optionArgument.Name} has already been evaluated.");
             }
+            
             optionArgument.Type = argumentProperty.Property.PropertyType;
 
             if (!optionArgument.Values.Any())

@@ -8,7 +8,8 @@ namespace CommandLineParser.Attributes
         public string ShortName { get; }
         public string LongName { get; }
         public object DefaultValue { get; set; }
-        public bool IsRequired { get; set; } = false;
+        public bool IsRequired { get; set; }
+        
         public OptionAttribute(char shortName, string longName)
         {
             ShortName = shortName.ToString();
