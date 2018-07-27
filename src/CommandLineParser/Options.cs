@@ -10,7 +10,10 @@
 
         public static readonly Options Default = new Options();
 
-        public Options(char shortPrefix = '-', string longPrefix = "--", string longHelpOption = "help", string shortHelpOption = "h")
+        public Options(char shortPrefix = '-', 
+            string longPrefix = "--", 
+            string longHelpOption = "help", 
+            string shortHelpOption = "h")
         {
             ShortPrefix = shortPrefix.ToString();
             LongPrefix = longPrefix;

@@ -256,18 +256,15 @@ namespace CommandLineParser
                         break;
                     case TokenType.Option:
                         var option = ParseOption(tokens);
-                        option.CommandName = commandName;
-                        EvaluateOption(option);
+                        EvaluateOption(commandName, option);
                         break;
                     case TokenType.Flag:
                         var flag = ParseFlag(tokens);
-                        flag.CommandName = commandName;
-                        EvaluateFlag(flag);
+                        EvaluateFlag(commandName, flag);
                         break;
                     case TokenType.Value:
                         var value = ParseValue(tokens);
-                        value.CommandName = commandName;
-                        EvaluateValue(value);
+                        EvaluateValue(commandName, value);
                         break;
                     case TokenType.Help when tokens[_currentPosition - 1].Type == TokenType.Command:
                         PrintHelp(commandName);
@@ -284,9 +281,9 @@ namespace CommandLineParser
             Console.WriteLine(_commandHelp[commandName]);
         }
 
-        private void EvaluateFlag(ParsedArgument flagArgument)
+        private void EvaluateFlag(string command, ParsedArgument flagArgument)
         {
-            var argumentProperty = _argumentProperties[flagArgument.CommandName][flagArgument.Name];
+            var argumentProperty = _argumentProperties[command][flagArgument.Name];
             if (argumentProperty.Evaluated)
             {
                 throw new RepeatingArgumentsException($"Argument {flagArgument.Name} has already been evaluated.");
@@ -295,17 +292,17 @@ namespace CommandLineParser
             argumentProperty.Evaluated = true;
         }
 
-        private void EvaluateValue(ParsedArgument valueArgument)
+        private void EvaluateValue(string command, ParsedArgument valueArgument)
         {
-            var argumentProperty = _valueProperties[valueArgument.CommandName].Dequeue();
+            var argumentProperty = _valueProperties[command].Dequeue();
             var parser = _parserFactory.GetParser(argumentProperty.Property.PropertyType);
             var value = parser.Parse(valueArgument);
             argumentProperty.Property.SetValue(_currentArguments, value);
         }
 
-        private void EvaluateOption(ParsedArgument optionArgument)
+        private void EvaluateOption(string command, ParsedArgument optionArgument)
         {
-            var argumentProperty = _argumentProperties[optionArgument.CommandName][optionArgument.Name];
+            var argumentProperty = _argumentProperties[command][optionArgument.Name];
             if (argumentProperty.Evaluated)
             {
                 throw new RepeatingArgumentsException($"Argument {optionArgument.Name} has already been evaluated.");

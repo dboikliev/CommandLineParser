@@ -23,18 +23,8 @@ namespace CommandLineParser
             {
                 var typeInfo = type.GetTypeInfo();
                 var typedInterface = typeInfo.GetInterfaces()
-                    .FirstOrDefault(i =>
-                    {
-                        if (i.GetTypeInfo().IsGenericType)
-                        {
-                            var genericInfo = i.GetGenericTypeDefinition();
-                            if (genericInfo == typedParser)
-                            {
-                                return true;
-                            }
-                        }
-                        return false;
-                    });
+                    .FirstOrDefault(i => i.GetTypeInfo().IsGenericType && 
+                                         i.GetGenericTypeDefinition() == typedParser);
                 if (typedInterface != null)
                 {
                     var lazyParser = new Lazy<ITypedParser>(() => (ITypedParser)Activator.CreateInstance(type));
