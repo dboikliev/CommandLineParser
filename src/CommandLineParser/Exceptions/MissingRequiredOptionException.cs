@@ -4,8 +4,8 @@ namespace CommandLineParser.Exceptions
 {
     public class MissingRequiredOptionException : Exception
     {
-        public MissingRequiredOptionException(string optionShortName, string optionLongName) 
-            : base($"The option \"{optionShortName}|{optionLongName}\" is required.")
+        public MissingRequiredOptionException(string command, string optionShortName, string optionLongName) 
+            : base($"{command}: The option \"{optionShortName}|{optionLongName}\" is required.")
         {
         }
     }

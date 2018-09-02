@@ -36,7 +36,7 @@ namespace CommandLineParser.Tests
         {
             var args = new[] { "-i", "4" };
             var parser = new Parser();
-            parser.Register<Arguments>(arguments => Assert.Equal(arguments.Test, int.Parse(args[1])))
+            parser.Register<Arguments>(arguments => Assert.Equal(int.Parse(args[1]), arguments.Test))
                 .Parse(args);
         }
 
@@ -45,7 +45,7 @@ namespace CommandLineParser.Tests
         {
             var args = new[] { "--integer", "4" };
             var parser = new Parser();
-            parser.Register<Arguments>(arguments => Assert.Equal(arguments.Test, int.Parse(args[1])))
+            parser.Register<Arguments>(arguments => Assert.Equal(int.Parse(args[1]), arguments.Test))
                 .Parse(args);
         }
 
@@ -56,8 +56,8 @@ namespace CommandLineParser.Tests
             var parser = new Parser();
             parser.Register<Arguments>(arguments =>
                 {
-                    Assert.Equal(arguments.Test, 4);
-                    Assert.Equal(arguments.AnotherTest, 10);
+                    Assert.Equal(4, arguments.Test);
+                    Assert.Equal(10, arguments.AnotherTest);
                 })
                 .Parse(args);
         }
@@ -69,7 +69,7 @@ namespace CommandLineParser.Tests
             var parser = new Parser();
             parser.Register<ArgumentsWithList>(arguments =>
                 {
-                    Assert.Equal(arguments.Numbers, Enumerable.Range(1, 4));
+                    Assert.Equal(Enumerable.Range(1, 4), arguments.Numbers);
                 })
                 .Parse(args);
         }
@@ -81,8 +81,8 @@ namespace CommandLineParser.Tests
             var parser = new Parser();
             parser.Register<ArgumentsWithMultipleLists>(arguments =>
                 {
-                    Assert.Equal(arguments.Numbers, new[] { 12, 13, 14 });
-                    Assert.Equal(arguments.Names, new[] { "aa", "bb", "cc" });
+                    Assert.Equal(new[] { 12, 13, 14 }, arguments.Numbers);
+                    Assert.Equal(new[] { "aa", "bb", "cc" }, arguments.Names);
                 })
                 .Parse(args);
         }

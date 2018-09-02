@@ -32,7 +32,7 @@ namespace CommandLineParser.Tests
             var parser = new Parser();
             parser.Register<ArgumentsWithEnum>(arguments =>
             {
-                Assert.Equal(arguments.Rgb, ArgumentsWithEnum.Color.Red);
+                Assert.Equal(ArgumentsWithEnum.Color.Red, arguments.Rgb);
             })
             .Parse(args);
         }
@@ -44,7 +44,7 @@ namespace CommandLineParser.Tests
             var parser = new Parser();
             parser.Register<ArgumentsWithEnum>(arguments =>
             {
-                Assert.Equal(arguments.Rgb, ArgumentsWithEnum.Color.Green);
+                Assert.Equal(ArgumentsWithEnum.Color.Green, arguments.Rgb);
             })
             .Parse(args);
         }
@@ -56,7 +56,7 @@ namespace CommandLineParser.Tests
             var parser = new Parser();
             parser.Register<ArgumentsWithEnum>(arguments =>
             {
-                Assert.Equal(arguments.Rgb, ArgumentsWithEnum.Color.Blue);
+                Assert.Equal(ArgumentsWithEnum.Color.Blue, arguments.Rgb);
             })
             .Parse(args);
         }

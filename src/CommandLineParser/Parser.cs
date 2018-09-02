@@ -65,7 +65,7 @@ namespace CommandLineParser
             {
                 if (_commandArguments.ContainsKey(commandAttribute.Name))
                 {
-                    throw new InvalidOperationException($"Command whith name {commandAttribute.Name} has already been registered.");
+                    throw new InvalidOperationException($"Command whith name \"{commandAttribute.Name}\" has already been registered.");
                 }
 
                 _commandNames.Add(commandAttribute.Name);
@@ -172,7 +172,8 @@ namespace CommandLineParser
             }
             catch (Exception ex) when (ex is MissingRequiredPositionalValueException ||
                                        ex is MissingRequiredOptionException ||
-                                       ex is RepeatingArgumentsException)
+                                       ex is RepeatingArgumentsException ||
+                                       ex is MissingValueForOptionException)
             {
                 Console.WriteLine(ex.Message);
             }
@@ -192,11 +193,11 @@ namespace CommandLineParser
 
         private void EvaluateRemainingProperties()
         {
-            foreach (var commandName in _parsedCommands)
+            foreach (var command in _parsedCommands)
             {
-                if (_commandArguments.ContainsKey(commandName))
+                if (_commandArguments.ContainsKey(command))
                 {
-                    var commandArgumentProperties = _argumentProperties[commandName];
+                    var commandArgumentProperties = _argumentProperties[command];
 
                     foreach (var commandArgumentProperty in commandArgumentProperties)
                     {
@@ -205,33 +206,33 @@ namespace CommandLineParser
                         {
                             if (attribute.IsRequired)
                             {
-                                throw new MissingRequiredOptionException(attribute.ShortName,
+                                throw new MissingRequiredOptionException(command, attribute.ShortName,
                                     attribute.LongName);
                             }
 
                             if (attribute.DefaultValue != null)
                             {
-                                var commandArguments = _commandArguments[commandName];
+                                var commandArguments = _commandArguments[command];
                                 argumentProperty.Property.SetValue(commandArguments,
                                     attribute.DefaultValue);
                             }
                         }
                     }
 
-                    while (_valueProperties.ContainsKey(commandName) && _valueProperties[commandName].Count > 0)
+                    while (_valueProperties.ContainsKey(command) && _valueProperties[command].Count > 0)
                     {
-                        var valueProperty = _valueProperties[commandName].Dequeue();
+                        var valueProperty = _valueProperties[command].Dequeue();
                         if (!valueProperty.Evaluated)
                         {
                             var attribute = (ValueAttribute)valueProperty.Argument;
                             if (attribute.IsRequired)
                             {
-                                throw new MissingRequiredPositionalValueException(attribute.Name);
+                                throw new MissingRequiredPositionalValueException(command, attribute.Name);
                             }
 
                             if (attribute.DefaultValue != null)
                             {
-                                var commandArguments = _commandArguments[commandName];
+                                var commandArguments = _commandArguments[command];
                                 valueProperty.Property.SetValue(commandArguments,
                                     attribute.DefaultValue);
                             }
@@ -286,7 +287,7 @@ namespace CommandLineParser
             var argumentProperty = _argumentProperties[command][flagArgument.Name];
             if (argumentProperty.Evaluated)
             {
-                throw new RepeatingArgumentsException($"Argument {flagArgument.Name} has already been evaluated.");
+                throw new RepeatingArgumentsException($"{command}: Argument \"{flagArgument.Name}\" has already been evaluated.");
             }
             argumentProperty.Property.SetValue(_currentArguments, true);
             argumentProperty.Evaluated = true;
@@ -305,14 +306,14 @@ namespace CommandLineParser
             var argumentProperty = _argumentProperties[command][optionArgument.Name];
             if (argumentProperty.Evaluated)
             {
-                throw new RepeatingArgumentsException($"Argument {optionArgument.Name} has already been evaluated.");
+                throw new RepeatingArgumentsException($"{command}: Argument \"{optionArgument.Name}\" has already been evaluated.");
             }
             
             optionArgument.Type = argumentProperty.Property.PropertyType;
 
             if (!optionArgument.Values.Any())
             {
-                throw new MissingValueForOptionException(optionArgument.Name);
+                throw new MissingValueForOptionException(command, optionArgument.Name);
             }
 
             var parser = _parserFactory.GetParser(optionArgument.Type);

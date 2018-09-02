@@ -38,12 +38,12 @@ namespace CommandLineParser.Tests
 
             parser.Register<Arguments>(arguments =>
             {
-                Assert.Equal(arguments.Test, "test");
+                Assert.Equal("test", arguments.Test);
             });
 
             parser.Register<CommandArguments>(commandArgs =>
             {
-                Assert.Equal(commandArgs.InnerOption, "innerTest");
+                Assert.Equal("innerTest", commandArgs.InnerOption);
             });
 
             parser.Parse(args);
@@ -56,15 +56,15 @@ namespace CommandLineParser.Tests
             var parser = new Parser();
             parser.Register<Arguments>(arguments =>
             {
-                Assert.Equal(arguments.Max, 10);
-                Assert.Equal(arguments.Test, "test");
+                Assert.Equal(10, arguments.Max);
+                Assert.Equal("test", arguments.Test);
             });
             parser.Register<CommandArguments>(commandArgs =>
             {
-                Assert.Equal(commandArgs.Foo, 1);
-                Assert.Equal(commandArgs.Bar, 2);
-                Assert.Equal(commandArgs.Moo, 3);
-                Assert.Equal(commandArgs.InnerOption, "innerTest");
+                Assert.Equal(1, commandArgs.Foo);
+                Assert.Equal(2, commandArgs.Bar);
+                Assert.Equal(3, commandArgs.Moo);
+                Assert.Equal("innerTest", commandArgs.InnerOption);
             });
             parser.Parse(args);
         }
@@ -76,10 +76,10 @@ namespace CommandLineParser.Tests
             var parser = new Parser();
             parser.Register<CommandArguments>(commandArgs =>
             {
-                Assert.Equal(commandArgs.Foo, 1);
-                Assert.Equal(commandArgs.Bar, 2);
-                Assert.Equal(commandArgs.Moo, 3);
-                Assert.Equal(commandArgs.InnerOption, "innerTest");
+                Assert.Equal(1, commandArgs.Foo);
+                Assert.Equal(2, commandArgs.Bar);
+                Assert.Equal(3, commandArgs.Moo);
+                Assert.Equal("innerTest", commandArgs.InnerOption);
             });
             parser.Parse(args);
         }

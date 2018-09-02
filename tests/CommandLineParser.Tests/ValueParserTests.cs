@@ -30,7 +30,7 @@ namespace CommandLineParser.Tests
             var parser = new Parser();
             parser.Register<ArgumentsWithPositionalValue>(arguments =>
             {
-                Assert.Equal(arguments.Min, 4);
+                Assert.Equal(4, arguments.Min);
             }).Parse(args);
         }
 
@@ -41,8 +41,8 @@ namespace CommandLineParser.Tests
             var parser = new Parser();
             parser.Register<ArgumentsWithMultiplePositionalValues>(arguments =>
             {
-                Assert.Equal(arguments.Min, 4);
-                Assert.Equal(arguments.Max, 5);
+                Assert.Equal(4, arguments.Min);
+                Assert.Equal(5, arguments.Max);
             }).Parse(args);
         }
     }
